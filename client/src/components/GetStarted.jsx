@@ -1,3 +1,6 @@
+// I wan tto chnage this somewhere else I dont want this to be the main get strated
+//Goal is to a have a nice Loig in or sign up
+//if sign up then itll be the code similar to this under here 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft } from 'react-icons/fa';
