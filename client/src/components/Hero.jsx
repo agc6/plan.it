@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import heroMockup from "../assets/mockup.png";
 
+
 const Hero = () => {
   return (
     <section className="relative h-screen flex flex-col md:flex-row items-center justify-center text-center md:text-left px-6 bg-gradient-to-b from-white to-gray-100">
@@ -24,6 +25,7 @@ const Hero = () => {
           >
             Get Started
           </motion.button>
+
           <motion.button 
             whileHover={{ scale: 1.05 }} 
             className="px-6 py-3 bg-gray-100 text-black rounded-lg shadow-md hover:bg-gray-200"
