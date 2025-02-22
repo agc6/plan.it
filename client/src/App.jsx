@@ -1,11 +1,19 @@
-import React from 'react'
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import Features from "./components/Features";
+import CTA from "./components/CTA";
+import Footer from "./components/Footer";
 
-const App = () => {
+function App() {
   return (
-    <div className='container bg-blue-200'>
-      <div className='text-4xl mx-7'>tailwind test</div>
+    <div>
+      <Navbar />
+      <Hero />
+      <Features />
+      <CTA />
+      <Footer />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
