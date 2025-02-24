@@ -43,7 +43,6 @@ const GetStarted = () => {
         <div className="flex justify-center mb-4">
           {/* 
             User icon section: displays a round background with a user icon in the center.
-            You can replace this with an image by swapping out the FaUser component.
           */}
           <div className="bg-gray-200 rounded-full p-5">
             <FaUser className="text-gray-500 text-4xl" />
