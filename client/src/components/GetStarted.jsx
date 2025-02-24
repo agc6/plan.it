@@ -1,87 +1,194 @@
-// I wan tto chnage this somewhere else I dont want this to be the main get strated
-//Goal is to a have a nice Loig in or sign up
-//if sign up then itll be the code similar to this under here 
+//my idea of the Get started unless ot be moved elsewhere 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaArrowLeft } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion'; // For adding animations to components
+import { FaUser } from 'react-icons/fa'; // Icon for user; can be replaced with an image if desired
 
-const steps = [
-  { id: 1, question: "What's your first name and last name?", field: "name" },
-  { id: 2, question: "What's your phone number?", field: "phone" },
-  { id: 3, question: "What are you using this for? (School, work, teacher, etc.)", field: "usage" },
-];
-
+// The GetStarted component renders a user authentication form that allows users to either sign in or sign up.
 const GetStarted = () => {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    usage: '',
-  });
+  // State to manage which tab is active ("signin" or "signup")
+  const [activeTab, setActiveTab] = useState("signin");
 
-  const handleNext = () => {
-    if (step < steps.length - 1) {
-      setStep(prev => prev + 1);
-    } else {
-      // Final submission logic here (e.g., API call)
-      console.log("Form submitted:", formData);
-    }
+  // State to store input values for the sign-in form
+  const [signinData, setSigninData] = useState({ login: "", password: "" });
+  // State to store input values for the sign-up form
+  const [signupData, setSignupData] = useState({ fullname: "", email: "", password: "" });
+
+  // Handler for updating sign-in input fields (controlled input)
+  const handleSigninChange = (e) =>
+    setSigninData({ ...signinData, [e.target.name]: e.target.value });
+
+  // Handler for updating sign-up input fields (controlled input)
+  const handleSignupChange = (e) =>
+    setSignupData({ ...signupData, [e.target.name]: e.target.value });
+
+  // Placeholder function for sign-in form submission
+  const handleSigninSubmit = (e) => {
+    e.preventDefault();
+    console.log("Sign In Data:", signinData);
   };
 
-  const handleBack = () => {
-    if (step > 0) {
-      setStep(prev => prev - 1);
-    }
+  // Placeholder function for sign-up form submission
+  const handleSignupSubmit = (e) => {
+    e.preventDefault();
+    console.log("Sign Up Data:", signupData);
   };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const currentStep = steps[step];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <AnimatePresence exitBeforeEnter>
-        <motion.div
-          key={currentStep.id}
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -100 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
-        >
-          <h2 className="text-xl font-semibold mb-4">{currentStep.question}</h2>
-          <input
-            type="text"
-            name={currentStep.field}
-            value={formData[currentStep.field]}
-            onChange={handleChange}
-            placeholder="Enter here"
-            className="w-full border border-gray-300 p-2 rounded mb-6"
-          />
-          <div className="flex justify-between items-center">
-            {step > 0 ? (
-              <button
-                onClick={handleBack}
-                className="flex items-center text-blue-500 hover:text-blue-700"
-              >
-                <FaArrowLeft className="mr-1" /> Back
-              </button>
-            ) : (
-              <div /> // Placeholder to keep spacing consistent
-            )}
-            <button
-              onClick={handleNext}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              {step < steps.length - 1 ? "Next" : "Submit"}
-            </button>
+    // Container with a minimum full-screen height, centering its children
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      {/* Card container for the form with a white background, rounded corners, and shadow */}
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        
+        {/* --- User Icon Section --- */}
+        <div className="flex justify-center mb-4">
+          {/* 
+            User icon section: displays a round background with a user icon in the center.
+            You can replace this with an image by swapping out the FaUser component.
+          */}
+          <div className="bg-gray-200 rounded-full p-5">
+            <FaUser className="text-gray-500 text-4xl" />
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </div>
+
+        {/* --- Tab Headers (Switch between Sign In and Sign Up) --- */}
+        <div className="flex justify-center space-x-8 mb-6">
+          {/* Sign In Tab Header */}
+          <div className="relative pb-2 cursor-pointer group">
+            <h2
+              onClick={() => setActiveTab("signin")}
+              className={`text-lg font-semibold transition-colors ${
+                activeTab === "signin" ? "text-black" : "text-gray-400 group-hover:text-gray-600"
+              }`}
+            >
+              Sign In
+            </h2>
+            {/* Animated underline effect: visible when active or on hover */}
+            <span
+              className={`absolute left-0 bottom-0 h-[2px] bg-blue-500 transition-all duration-300 
+                ${activeTab === "signin" ? "w-full" : "w-0 group-hover:w-full"}
+              `}
+            ></span>
+          </div>
+
+          {/* Sign Up Tab Header */}
+          <div className="relative pb-2 cursor-pointer group">
+            <h2
+              onClick={() => setActiveTab("signup")}
+              className={`text-lg font-semibold transition-colors ${
+                activeTab === "signup" ? "text-black" : "text-gray-400 group-hover:text-gray-600"
+              }`}
+            >
+              Sign Up
+            </h2>
+            {/* Animated underline effect similar to Sign In */}
+            <span
+              className={`absolute left-0 bottom-0 h-[2px] bg-blue-500 transition-all duration-300 
+                ${activeTab === "signup" ? "w-full" : "w-0 group-hover:w-full"}
+              `}
+            ></span>
+          </div>
+        </div>
+
+        {/* --- Animated Form Section --- */}
+        <AnimatePresence mode="wait">
+          {activeTab === "signin" ? (
+            // Sign In Form with framer-motion animations on enter/exit
+            <motion.form
+              key="signin"
+              onSubmit={handleSigninSubmit}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Login input field */}
+              <input
+                type="text"
+                name="login"
+                value={signinData.login}
+                onChange={handleSigninChange}
+                placeholder="Login"
+                className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+                           focus:ring-2 focus:ring-blue-400"
+              />
+              {/* Password input field */}
+              <input
+                type="password"
+                name="password"
+                value={signinData.password}
+                onChange={handleSigninChange}
+                placeholder="Password"
+                className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+                           focus:ring-2 focus:ring-blue-400"
+              />
+              {/* Submit button for Sign In */}
+              <button
+                type="submit"
+                className="block w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Log In
+              </button>
+              {/* Link for password recovery */}
+              <div className="text-center mt-4">
+                <a href="#" className="text-sm text-blue-500 hover:text-blue-700 underline">
+                  Forgot Password?
+                </a>
+              </div>
+            </motion.form>
+          ) : (
+            // Sign Up Form with similar animations as Sign In form
+            <motion.form
+              key="signup"
+              onSubmit={handleSignupSubmit}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Full name input field */}
+              <input
+                type="text"
+                name="fullname"
+                value={signupData.fullname}
+                onChange={handleSignupChange}
+                placeholder="Full Name"
+                className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+                           focus:ring-2 focus:ring-blue-400"
+              />
+              {/* Email input field */}
+              <input
+                type="email"
+                name="email"
+                value={signupData.email}
+                onChange={handleSignupChange}
+                placeholder="Email"
+                className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+                           focus:ring-2 focus:ring-blue-400"
+              />
+              {/* Password input field */}
+              <input
+                type="password"
+                name="password"
+                value={signupData.password}
+                onChange={handleSignupChange}
+                placeholder="Password"
+                className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none 
+                           focus:ring-2 focus:ring-blue-400"
+              />
+              {/* Submit button for Sign Up */}
+              <button
+                type="submit"
+                className="block w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Sign Up
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
 
 export default GetStarted;
+
