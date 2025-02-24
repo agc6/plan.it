@@ -15,7 +15,7 @@ const CalendarSite = () => {
           className={`mb-4 w-14 h-14 flex items-center justify-center text-2xl font-bold rounded-xl shadow-lg
                       ${activeView === "monthly" ? "bg-blue-500 text-white" : "bg-white text-blue-500"}
                       hover:scale-110 transition-transform duration-300`}
-        >
+        > {/* BUTTONS section that will transfer form Monthly Weekly and Daily with its round button decore */}
           M
         </button>
         <button 
