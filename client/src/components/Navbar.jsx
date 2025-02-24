@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import TempCalendarButton from "./TempCalendarButton"; // adjust the path if needed its temporary just to check
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,11 +21,13 @@ const Navbar = () => {
         <div className="hidden md:flex space-x-4">
           <button className="px-4 py-2 text-gray-600 hover:text-black">Login</button>
           <button className="px-5 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">
-            Sign Up
+          Sign Up
           </button>
+          {/* Temporary Calendar Button */}
+          <TempCalendarButton />
         </div>
 
-        {/* Menu, mobile ver. */}
+        {/* Mobile Menu Toggle */}
         <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
           ☰
         </button>

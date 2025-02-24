@@ -5,6 +5,8 @@ import Features from "./components/Features";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
 import GetStarted from "./components/GetStarted"; // added a get strated
+import Calender from "./components/CalenderSite/Calender";  //added calnder page with folder
+import TempCalendarButton from "./components/TempCalendarButton"; // adjust path as needed (rn its an issue)
 
 
 function App() {
@@ -23,8 +25,10 @@ function App() {
         }
       />
       <Route path="/get-started" element={<GetStarted />} />
+      {/* Calendar route */}
+      <Route path="/calendar" element={<Calender />} />
     </Routes>
   );
 }
- 
+
 export default App;
