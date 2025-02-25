@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TempCalendarButton from "./TempCalendarButton"; // adjust the path if needed its temporary just to check
+import favicon from "../assets/favicon.svg";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,7 +10,10 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 w-full backdrop-blur-lg bg-white/70 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
         {/* Logo, no image for now */}
-        <h1 className="text-2xl font-bold text-black">plan.it</h1>
+        <div className="container mx-auto flex">
+          <img src={favicon}/>
+          <h1 className="text-2xl font-bold text-black">plan.it</h1>
+        </div>
 
         {/* Menu, desktop ver. */}
         <ul className="hidden md:flex space-x-6 text-gray-700">
