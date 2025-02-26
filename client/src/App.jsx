@@ -4,7 +4,7 @@ import Hero from "./components/Hero";
 import Features from "./components/Features";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
-import GetStarted from "./components/GetStarted"; // added a get strated
+import GetStarted from "./pages/GetStarted"; // added a get strated
 import Calender from "./components/CalenderSite/Calender";  //added calnder page with folder
 
 
