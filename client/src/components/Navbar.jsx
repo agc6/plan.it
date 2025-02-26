@@ -10,7 +10,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 w-full backdrop-blur-lg bg-white/70 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
         {/* Logo, no image for now */}
-        <div className="container mx-auto flex">
+        <div className="flex items-center space-x-2">
           <img src={favicon}/>
           <h1 className="text-2xl font-bold text-black">plan.it</h1>
         </div>
@@ -22,8 +22,8 @@ const Navbar = () => {
         </ul>
 
         {/* Login/sign up Buttons */}
-        <div className="hidden md:flex space-x-4">
-          <button className="px-4 py-2 text-gray-600 hover:text-black">Login</button>
+        <div className="hidden md:flex space-x-3">
+          <button className="px-5 py-2 text-gray-600 hover:text-black">Login</button>
           <button className="px-5 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">
           Sign Up
           </button>
