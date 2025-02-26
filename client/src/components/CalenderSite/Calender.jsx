@@ -2,6 +2,7 @@ import { useState } from "react";
 import MonthlyPage from "./MonthlyPage";
 import WeeklyPage from "./WeeklyPage";
 import DailyPage from "./DailyPage";
+import userIcon from "../../assets/user-icon.svg";
 
 const CalendarSite = () => {
   const [activeView, setActiveView] = useState("monthly");
@@ -38,7 +39,7 @@ const CalendarSite = () => {
         {/* User Icon */}
         <div className="mt-auto mb-4">
           <img 
-            src="/path/to/user-icon.svg" 
+            src={userIcon}
             alt="User" 
             className="w-12 h-12 rounded-full border-2 border-gray-300" 
           />
