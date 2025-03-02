@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MonthlyPage from "./MonthlyPage";
+import MonthlyPage from "./Monthlypage";
 import WeeklyPage from "./WeeklyPage";
 import DailyPage from "./DailyPage";
 import userIcon from "../../assets/user-icon.svg";
