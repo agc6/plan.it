@@ -3,12 +3,12 @@ import MonthlyPage from "./Monthlypage";
 import WeeklyPage from "./WeeklyPage";
 import DailyPage from "./DailyPage";
 import userIcon from "../../assets/user-icon.svg";
-
+import UserSettings from "../../pages/UserSettings";
 
 const CalendarSite = () => {
   const [activeView, setActiveView] = useState("weekly");
   const [showCalendars, setShowCalendars] = useState(true);
-
+  const [showUserSettings, setShowUserSettings] = useState(false);
 
   // Helper to generate classes for each nav button
   const getButtonClasses = (view) => {
@@ -31,16 +31,14 @@ const CalendarSite = () => {
     return classes;
   };
 
-
   return (
-    <div className="flex h-screen bg-[#EBEDF3]">
+    <div className="flex h-screen bg-[#EBEDF3] relative">
       {/* Sidebar */}
       <div className="w-64 bg-[#EBEDF3] flex flex-col py-6 px-4">
         {/* Logo / Title */}
         <div className="mb-6">
           <span className="text-xl font-bold text-[#222222]">Plan.it</span>
         </div>
-
 
         {/* Navigation Items */}
         <div className="flex flex-col space-y-2 mb-6">
@@ -121,7 +119,10 @@ const CalendarSite = () => {
             <span className="text-sm text-[#222222]">⚙️</span>
             <span className="text-xs text-gray-700">Settings</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div
+            className="flex items-center space-x-2 cursor-pointer"
+            onClick={() => setShowUserSettings(true)}
+          >
             <img
               src={userIcon}
               alt="User"
@@ -145,9 +146,24 @@ const CalendarSite = () => {
         {/* Bottom gap */}
         <div className="h-0"></div>
       </div>
+
+      {/* User Settings Modal */}
+      {showUserSettings && (
+        <div className="fixed inset-0 backdrop-blur-[2px] flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
+            {/* Close Button */}
+            <button
+              className="absolute top-3 right-3 text-gray-600 text-xl"
+              onClick={() => setShowUserSettings(false)}
+            >
+              ✖
+            </button>
+            <UserSettings />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 
 export default CalendarSite;
