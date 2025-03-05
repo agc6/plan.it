@@ -1,12 +1,11 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
-import GetStarted from "./pages/GetStarted"; // added a get strated
-import Calender from "./components/CalenderSite/Calender";  //added calnder page with folder
-
+import GetStarted from "./pages/GetStarted"; // Sign In/Sign Up page
+import Calender from "./components/CalenderSite/Calender";  // Calendar page
 
 function App() {
   return (
