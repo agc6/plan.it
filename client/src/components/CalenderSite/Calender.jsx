@@ -4,9 +4,16 @@ import WeeklyPage from "./WeeklyPage";
 import DailyPage from "./DailyPage";
 import userIcon from "../../assets/user-icon.svg";
 import UserSettings from "../../pages/UserSettings";
+import CustomButton from "./CustomButton";
+import editIcon0 from "../../assets/editIcon0.svg";
+import editIcon1 from "../../assets/editIcon1.svg";
+import customizeIcon0 from "../../assets/customizeStyle0.svg";
+import customizeIcon1 from "../../assets/customizeStyle1.svg";
+import darkModeIcon0 from "../../assets/darkMode0.svg";
+import darkModeIcon1 from "../../assets/darkMode1.svg";
 
 const CalendarSite = () => {
-  const [activeView, setActiveView] = useState("weekly");
+  const [activeView, setActiveView] = useState("monthly");
   const [showCalendars, setShowCalendars] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
 
@@ -34,10 +41,10 @@ const CalendarSite = () => {
   return (
     <div className="flex h-screen bg-[#EBEDF3] relative">
       {/* Sidebar */}
-      <div className="w-64 bg-[#EBEDF3] flex flex-col py-6 px-4">
+      <div className="w-64 bg-[#EBEDF3] flex flex-col m-4">
         {/* Logo / Title */}
         <div className="mb-6">
-          <span className="text-xl font-bold text-[#222222]">Plan.it</span>
+          <span className="text-2xl font-archivo font-bold text-[#222222]">Plan.it</span>
         </div>
 
         {/* Navigation Items */}
@@ -137,8 +144,14 @@ const CalendarSite = () => {
       {/* Main Content Area with header & bottom gap */}
       <div className="flex-1 flex flex-col">
         {/* Header space */}
-        <div className="h-16"></div>
-        <main className="flex-1 m-6 bg-white shadow-lg rounded-[16px] p-6 overflow-auto">
+        <div className="h-[58px] flex justify-end">
+            <div>
+              <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1}/>
+              <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1}/>
+              <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px"/>
+            </div>
+        </div>
+        <main className="w-[1278px] h-[666] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
           {activeView === "monthly" && <MonthlyPage />}
           {activeView === "weekly" && <WeeklyPage />}
           {activeView === "daily" && <DailyPage />}
