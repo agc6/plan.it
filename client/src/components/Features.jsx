@@ -5,19 +5,19 @@ import { FaCalendarCheck, FaBell, FaSyncAlt } from "react-icons/fa";
 const features = [
   { 
     title: "Smart Scheduling", 
-    desc: "Blah Blah Blah Blah.", 
+    desc: "Plan your days ahead.", 
     icon: <FaCalendarCheck className="text-white text-3xl" />,
     bgColor: "bg-blue-500"
   },
   { 
-    title: "Reminders & Alerts", 
-    desc: "No not really LOL.", 
+    title: "Personalized Planning", 
+    desc: "Create your own visuals.", 
     icon: <FaBell className="text-white text-3xl" />,
     bgColor: "bg-green-500"
   },
   { 
-    title: "Feature Number 3", 
-    desc: "Blah Blah Blah Blah", 
+    title: "Automatic Roll Over", 
+    desc: "Unfinished tasks will be saved for later.", 
     icon: <FaSyncAlt className="text-white text-3xl" />,
     bgColor: "bg-purple-500"
   }
