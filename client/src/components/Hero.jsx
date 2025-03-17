@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import heroMockup from "../assets/mockup.png";
-
 
 const Hero = () => {
   return (
@@ -19,11 +19,12 @@ const Hero = () => {
           A smart planner to organize tasks, and do stuff and more stuff yasss.
         </p>
         <div className="mt-6 flex space-x-4">
+          {/* Wrap the Get Started button in a Link */}
           <motion.button 
             whileHover={{ scale: 1.05 }} 
             className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
           >
-            Get Started
+            <Link to="/get-started" className="block">Get Started</Link>
           </motion.button>
 
           <motion.button 
@@ -37,7 +38,7 @@ const Hero = () => {
 
       {/* Right Side - Image + Floating Elements */}
       <div className="relative w-full max-w-md mt-10 md:mt-0">
-      <img src={heroMockup} alt="App Preview" className="w-full drop-shadow-lg" />
+        <img src={heroMockup} alt="App Preview" className="w-full drop-shadow-lg" />
 
         {/* Floating Task Cards */}
         <motion.div 
