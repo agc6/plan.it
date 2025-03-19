@@ -1,20 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const UserSettings = () => {
+  // State for user data
   const [user, setUser] = useState({
-    firstName: "Jane",
-    lastName: "Doe",
-    email: "emailis@private.com",
+    name: "",
+    email: "",
     password: "",
   });
 
+  // Load user data from localStorage when component mounts
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser({
+        name: storedUser.name || "",
+        email: storedUser.email || "",
+        password: "", // Do not load password for security reasons
+      });
+    }
+  }, []);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    alert("Changes saved successfully!"); // Replace with actual save function
+  // Handle Save Changes (Update User Info)
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token"); // Get user token
+      const response = await fetch("http://localhost:5000/api/auth/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(user),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Update failed");
+
+      // Update localStorage with new user info
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      alert("Changes saved successfully!");
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -38,28 +72,15 @@ const UserSettings = () => {
 
       {/* Form Fields */}
       <div className="mt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 text-sm mb-1">First name</label>
-            <input
-              type="text"
-              name="firstName"
-              value={user.firstName}
-              className="w-full p-2 border rounded-md"
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 text-sm mb-1">Last name</label>
-            <input
-              type="text"
-              name="lastName"
-              value={user.lastName}
-              className="w-full p-2 border rounded-md"
-              onChange={handleChange}
-            />
-          </div>
+        <div className="mt-4">
+          <label className="block text-gray-700 text-sm mb-1">Full Name</label>
+          <input
+            type="text"
+            name="name"
+            value={user.name}
+            className="w-full p-2 border rounded-md"
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mt-4">
@@ -82,6 +103,7 @@ const UserSettings = () => {
             value={user.password}
             className="w-full p-2 border rounded-md"
             onChange={handleChange}
+            placeholder="Leave blank to keep current password"
           />
         </div>
 
@@ -107,3 +129,4 @@ const UserSettings = () => {
 };
 
 export default UserSettings;
+

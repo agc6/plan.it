@@ -1,19 +1,41 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion'; // For adding animations to the component
-import { FaUser } from 'react-icons/fa'; // User icon
+import { useNavigate } from 'react-router-dom'; // Redirect after signup
+import { motion } from 'framer-motion'; // Animations
+import { FaUser } from 'react-icons/fa';
 
 const GetStarted = () => {
-  // State to store input values for the sign-up form
-  const [signupData, setSignupData] = useState({ fullname: "", email: "", password: "" });
+  const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState(""); // Store error messages
+  const navigate = useNavigate(); // Used for redirecting
 
-  // Handler for updating sign-up input fields (controlled input)
+  // Handle input changes
   const handleSignupChange = (e) =>
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
 
-  // Placeholder function for sign-up form submission
-  const handleSignupSubmit = (e) => {
+  // Handle form submission
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign Up Data:", signupData);
+    setError(""); // Reset previous errors
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Registration failed");
+
+      // Save user token and info
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to the calendar page
+      navigate("/calendar");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -26,6 +48,9 @@ const GetStarted = () => {
           </div>
         </div>
 
+        
+        {error && <p className="text-red-500 text-center">{error}</p>}
+
         {/* Animated Sign Up Form */}
         <motion.form
           onSubmit={handleSignupSubmit}
@@ -36,10 +61,11 @@ const GetStarted = () => {
         >
           <input
             type="text"
-            name="fullname"
-            value={signupData.fullname}
+            name="name"
+            value={signupData.name}
             onChange={handleSignupChange}
             placeholder="Full Name"
+            required
             className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
@@ -48,6 +74,7 @@ const GetStarted = () => {
             value={signupData.email}
             onChange={handleSignupChange}
             placeholder="Email"
+            required
             className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
@@ -56,6 +83,7 @@ const GetStarted = () => {
             value={signupData.password}
             onChange={handleSignupChange}
             placeholder="Password"
+            required
             className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
@@ -71,3 +99,4 @@ const GetStarted = () => {
 };
 
 export default GetStarted;
+

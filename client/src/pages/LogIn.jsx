@@ -1,70 +1,78 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion'; // For adding animations to the component
-import { FaUser } from 'react-icons/fa'; // User icon
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Redirect after login
+import { FaUser } from "react-icons/fa";
 
-const GetStarted = () => {
-  // State to store input values for the sign-in form
-  const [signinData, setSigninData] = useState({ login: "", password: "" });
+const LogIn = () => {
+  const [signinData, setSigninData] = useState({ email: "", password: "" });
+  const [error, setError] = useState(""); // Store error messages
+  const navigate = useNavigate(); // Used for redirecting
 
-  // Handler for updating sign-in input fields (controlled input)
+  // Handle input changes
   const handleSigninChange = (e) =>
     setSigninData({ ...signinData, [e.target.name]: e.target.value });
 
-  // Placeholder function for sign-in form submission
-  const handleSigninSubmit = (e) => {
+  // Handle form submission
+  const handleSigninSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign In Data:", signinData);
+    setError(""); // Reset previous errors
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signinData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Login failed");
+
+      // Save user token and info
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to the calendar page
+      navigate("/calendar");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-        {/* User Icon Section */}
         <div className="flex justify-center mb-4">
           <div className="bg-gray-200 rounded-full p-5">
-            <FaUser className="text-gray-500 text-4xl" />
+            <FaUser className="text-gray-600 text-3xl" />
           </div>
         </div>
-
-        {/* Animated Sign In Form */}
-        <motion.form
-          onSubmit={handleSigninSubmit}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3 }}
-        >
+        <h2 className="text-2xl font-semibold text-center">Sign In</h2>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        <form onSubmit={handleSigninSubmit} className="mt-4">
           <input
-            type="text"
-            name="login"
-            value={signinData.login}
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={signinData.email}
             onChange={handleSigninChange}
-            placeholder="Login"
-            className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+            className="w-full p-2 border rounded mb-3"
           />
           <input
             type="password"
             name="password"
+            placeholder="Password"
             value={signinData.password}
             onChange={handleSigninChange}
-            placeholder="Password"
-            className="block w-full mb-4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+            className="w-full p-2 border rounded mb-3"
           />
-          <button
-            type="submit"
-            className="block w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
-          >
-            Log In
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">
+            Login
           </button>
-          <div className="text-center mt-4">
-            <a href="#" className="text-sm text-blue-500 hover:text-blue-700 underline">
-              Forgot Password?
-            </a>
-          </div>
-        </motion.form>
+        </form>
       </div>
     </div>
   );
 };
 
-export default GetStarted;
+export default LogIn;

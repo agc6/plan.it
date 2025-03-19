@@ -1,19 +1,26 @@
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("./connection"); // Connects to MongoDB
+const cors = require("cors");
+
+const authRoutes = require("./routes/authRoutes"); //Handles authentication
 
 const app = express();
 
 const port = process.env.PORT || 5000;
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use("/api/auth", authRoutes); // Adds authentication routes
+
+// Default route
+app.get("/", (req, res) => {
+  res.send("Welcome to Express API");
 });
 
-app.use((req, res, next) => {
-  res.send('Welcome to Express');
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+// Start server
+app.listen(port, () => console.log(`Server running on port ${port}`));
