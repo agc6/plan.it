@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MonthlyPage from "./Monthlypage";
 import WeeklyPage from "./WeeklyPage";
 import DailyPage from "./DailyPage";
@@ -16,7 +16,20 @@ const CalendarSite = () => {
   const [activeView, setActiveView] = useState("monthly");
   const [showCalendars, setShowCalendars] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
+  const [userName, setUserName] = useState(""); // State for user name
 
+  // Load user name from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUserName(parsedUser.name || "User");
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, [localStorage.getItem("user")]);  // Rerun when user data updates  
   // Helper to generate classes for each nav button
   const getButtonClasses = (view) => {
     let classes = `
@@ -135,7 +148,7 @@ const CalendarSite = () => {
               alt="User"
               className="w-8 h-8 rounded-full border-2 border-gray-300"
             />
-            <span className="text-xs text-gray-700">Jane Doe</span>
+            <span className="text-xs text-gray-700">{userName || "User"}</span>
           </div>
         </div>
       </div>
