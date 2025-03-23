@@ -18,6 +18,7 @@ const CalendarSite = () => {
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [userName, setUserName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedWeek, setSelectedWeek] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -147,14 +148,15 @@ const CalendarSite = () => {
         </div>
         <main className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
           {activeView === "monthly" && (
-            <MonthlyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
+            <MonthlyPage
+              selectedColor={selectedColor}
+              clearSelectedColor={clearSelectedColor}
+              setSelectedWeek={setSelectedWeek}
+              setActiveView={setActiveView}
+            />
           )}
-          {activeView === "weekly" && (
-            <WeeklyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
-          )}
-          {activeView === "daily" && (
-            <DailyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
-          )}
+          {activeView === "weekly" && <WeeklyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />}
+          {activeView === "daily" && <DailyPage selectedWeek={selectedWeek} selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />}
         </main>
         <div className="h-0"></div>
       </div>
