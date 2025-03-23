@@ -11,7 +11,6 @@ const ToDoList = ({
   customLeftDatePadding,
   selectedColor = "",
   clearSelectedColor = () => {},
-  days = [] // New prop to render individual days (for DailyPage)
 }) => {
   const heightToUse = customHeight || "358px";
   const widthToUse = customWidth || "293px";
@@ -26,10 +25,10 @@ const ToDoList = ({
       id: Date.now(),
       text: "",
       animate: true,
-      color: selectedColor || "bg-blue-200",
+      color: selectedColor || "bg-blue-200", // fallback color
     };
     setTaskInputs([newTask, ...taskInputs]);
-    clearSelectedColor();
+    clearSelectedColor(); // clear selected color after task is added
   };
 
   const handleKeyDown = (event, id) => {
@@ -83,57 +82,44 @@ const ToDoList = ({
         </h1>
       </div>
 
-      {/* If days are passed, show day blocks instead of a normal task list */}
-      {days.length > 0 ? (
-        <div className="mt-4 grid grid-cols-4 gap-2">
-          {days.map((day, index) => (
-            <div
-              key={index}
-              className="p-4 rounded-md border border-gray-300 shadow-sm text-sm font-semibold text-center"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div
-          className="mt-2 overflow-y-auto custom-scrollbar"
-          style={{
-            maxHeight: `calc(${heightToUse} - 75px)`,
-            paddingRight: "20px",
-          }}
-        >
-          {taskInputs.map((task) => (
-            <div
-              key={task.id}
-              className={`flex items-center space-x-3 mb-2 w-full ${task.color}`}
-            >
-              <button
-                className="w-4 h-4 rounded-full border-2 border-black bg-white cursor-pointer"
-                title="Apply selected color"
-                onClick={() => handleCircleClick(task.id)}
-              />
-              <input
-                type="text"
-                placeholder="Enter a task..."
-                value={task.text}
-                onChange={(e) => handleChange(e, task.id)}
-                onKeyDown={(e) => handleKeyDown(e, task.id)}
-                className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform ${
-                  task.animate ? "animate-slide-down" : ""
-                }`}
-                onAnimationEnd={() => {
-                  setTaskInputs((prev) =>
-                    prev.map((t) =>
-                      t.id === task.id ? { ...t, animate: false } : t
-                    )
-                  );
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Task List */}
+      <div
+        className="mt-2 overflow-y-auto custom-scrollbar"
+        style={{
+          maxHeight: `calc(${heightToUse} - 75px)`,
+          paddingRight: "20px",
+        }}
+      >
+        {taskInputs.map((task) => (
+          <div
+            key={task.id}
+            className={`flex items-center space-x-3 mb-2 w-full ${task.color}`}
+          >
+            <button
+              className="w-4 h-4 rounded-full border-2 border-black bg-white cursor-pointer"
+              title="Apply selected color"
+              onClick={() => handleCircleClick(task.id)}
+            />
+            <input
+              type="text"
+              placeholder="Enter a task..."
+              value={task.text}
+              onChange={(e) => handleChange(e, task.id)}
+              onKeyDown={(e) => handleKeyDown(e, task.id)}
+              className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform ${
+                task.animate ? "animate-slide-down" : ""
+              }`}
+              onAnimationEnd={() => {
+                setTaskInputs((prev) =>
+                  prev.map((t) =>
+                    t.id === task.id ? { ...t, animate: false } : t
+                  )
+                );
+              }}
+            />
+          </div>
+        ))}
+      </div>
 
       {/* Add Button */}
       <button
@@ -144,6 +130,7 @@ const ToDoList = ({
         +
       </button>
 
+      {/* Custom Scrollbar & Animation */}
       <style>{`
         .custom-scrollbar {
           scrollbar-width: thin;
@@ -196,8 +183,6 @@ ToDoList.propTypes = {
   customLeftDatePadding: PropTypes.string,
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
-  days: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default ToDoList;
-
