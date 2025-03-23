@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const ToDoList = ({
   weekText,
@@ -7,33 +8,27 @@ const ToDoList = ({
   customTitleWidth,
   customFontSize,
   customWidth,
-  customLeftDatePadding
+  customLeftDatePadding,
+  selectedColor = "",
+  clearSelectedColor = () => {},
 }) => {
-  const defaultHeight = "358px";
-  const heightToUse = customHeight || defaultHeight;
-
-  const defaultWidth = "293px";
-  const widthToUse = customWidth || defaultWidth;
-
-  const defaultTitleWidth = "125px";
-  const titleWidthToUse = customTitleWidth || defaultTitleWidth;
-
-  const defaultFontSize = "24px";
-  const fontSizeToUse = customFontSize || defaultFontSize;
-
-  const defaultLeftDatePadding = "21px";
-  const leftDatePaddingToUse = customLeftDatePadding || defaultLeftDatePadding;
+  const heightToUse = customHeight || "358px";
+  const widthToUse = customWidth || "293px";
+  const titleWidthToUse = customTitleWidth || "125px";
+  const fontSizeToUse = customFontSize || "24px";
+  const leftDatePaddingToUse = customLeftDatePadding || "21px";
 
   const [taskInputs, setTaskInputs] = useState([]);
 
-  // Add new task with unique ID and animation flag
   const addNewTask = () => {
     const newTask = {
-      id: Date.now(), // or use UUID for guaranteed uniqueness
+      id: Date.now(),
       text: "",
-      animate: true
+      animate: true,
+      color: selectedColor || "bg-blue-200", // fallback color
     };
     setTaskInputs([newTask, ...taskInputs]);
+    clearSelectedColor(); // clear selected color after task is added
   };
 
   const handleKeyDown = (event, id) => {
@@ -50,12 +45,23 @@ const ToDoList = ({
     );
   };
 
+  const handleCircleClick = (id) => {
+    if (selectedColor) {
+      setTaskInputs((prev) =>
+        prev.map((task) =>
+          task.id === id ? { ...task, color: selectedColor } : task
+        )
+      );
+      clearSelectedColor();
+    }
+  };
+
   return (
     <div
-      className="relative group m-3.25 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 p-4"
+      className="relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 p-4"
       style={{ height: heightToUse, width: widthToUse }}
     >
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex flex-row items-center rounded-t-[25px] h-12">
         <div
           className="outline-[0.5px] outline-[#484848] rounded-tl-[25px] rounded-br-[25px] h-12 flex items-center justify-center px-3"
@@ -76,34 +82,42 @@ const ToDoList = ({
         </h1>
       </div>
 
-      {/* Scrollable Task List */}
+      {/* Task List */}
       <div
         className="mt-2 overflow-y-auto custom-scrollbar"
         style={{
           maxHeight: `calc(${heightToUse} - 75px)`,
-          paddingRight: "20px"
+          paddingRight: "20px",
         }}
       >
         {taskInputs.map((task) => (
-          <input
+          <div
             key={task.id}
-            type="text"
-            placeholder="Enter a task..."
-            value={task.text}
-            onChange={(e) => handleChange(e, task.id)}
-            onKeyDown={(e) => handleKeyDown(e, task.id)}
-            className={`w-full p-2 border border-gray-300 rounded mt-2 transition-all duration-300 ease-in-out transform ${
-              task.animate ? "animate-slide-down" : ""
-            }`}
-            onAnimationEnd={() => {
-              // Remove animation flag after it runs
-              setTaskInputs((prev) =>
-                prev.map((t) =>
-                  t.id === task.id ? { ...t, animate: false } : t
-                )
-              );
-            }}
-          />
+            className={`flex items-center space-x-3 mb-2 w-full ${task.color}`}
+          >
+            <button
+              className="w-4 h-4 rounded-full border-2 border-black bg-white cursor-pointer"
+              title="Apply selected color"
+              onClick={() => handleCircleClick(task.id)}
+            />
+            <input
+              type="text"
+              placeholder="Enter a task..."
+              value={task.text}
+              onChange={(e) => handleChange(e, task.id)}
+              onKeyDown={(e) => handleKeyDown(e, task.id)}
+              className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform ${
+                task.animate ? "animate-slide-down" : ""
+              }`}
+              onAnimationEnd={() => {
+                setTaskInputs((prev) =>
+                  prev.map((t) =>
+                    t.id === task.id ? { ...t, animate: false } : t
+                  )
+                );
+              }}
+            />
+          </div>
         ))}
       </div>
 
@@ -111,12 +125,13 @@ const ToDoList = ({
       <button
         onClick={addNewTask}
         className="absolute bottom-3 right-3 bg-blue-500 text-white w-10 h-10 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md"
+        title="Add Task"
       >
         +
       </button>
 
-      {/* Scrollbar + Slide Down Animation */}
-      <style jsx>{`
+      {/* Custom Scrollbar & Animation */}
+      <style>{`
         .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
@@ -156,6 +171,18 @@ const ToDoList = ({
       `}</style>
     </div>
   );
+};
+
+ToDoList.propTypes = {
+  weekText: PropTypes.string,
+  dateRange: PropTypes.string,
+  customHeight: PropTypes.string,
+  customTitleWidth: PropTypes.string,
+  customFontSize: PropTypes.string,
+  customWidth: PropTypes.string,
+  customLeftDatePadding: PropTypes.string,
+  selectedColor: PropTypes.string,
+  clearSelectedColor: PropTypes.func,
 };
 
 export default ToDoList;

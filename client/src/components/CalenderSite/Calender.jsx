@@ -16,9 +16,9 @@ const CalendarSite = () => {
   const [activeView, setActiveView] = useState("monthly");
   const [showCalendars, setShowCalendars] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
-  const [userName, setUserName] = useState(""); // State for user name
+  const [userName, setUserName] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
 
-  // Load user name from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -29,8 +29,8 @@ const CalendarSite = () => {
         console.error("Error parsing user data:", error);
       }
     }
-  }, [localStorage.getItem("user")]);  // Rerun when user data updates  
-  // Helper to generate classes for each nav button
+  }, []);
+
   const getButtonClasses = (view) => {
     let classes = `
       flex items-center
@@ -51,76 +51,62 @@ const CalendarSite = () => {
     return classes;
   };
 
+  const handleColorClick = (color) => {
+    setSelectedColor(color);
+  };
+
+  const clearSelectedColor = () => {
+    setSelectedColor("");
+  };
+
   return (
     <div className="flex h-screen bg-[#EBEDF3] relative">
-      {/* Sidebar */}
       <div className="w-64 bg-[#EBEDF3] flex flex-col m-4">
-        {/* Logo / Title */}
         <div className="mb-6">
           <span className="text-2xl font-archivo font-bold text-[#222222]">Plan.it</span>
         </div>
 
-        {/* Navigation Items */}
         <div className="flex flex-col space-y-2 mb-6">
-          <div
-            className={getButtonClasses("monthly")}
-            onClick={() => setActiveView("monthly")}
-          >
+          <div className={getButtonClasses("monthly")} onClick={() => setActiveView("monthly")}>
             <span>Monthly</span>
           </div>
-          <div
-            className={getButtonClasses("weekly")}
-            onClick={() => setActiveView("weekly")}
-          >
+          <div className={getButtonClasses("weekly")} onClick={() => setActiveView("weekly")}>
             <span>Weekly</span>
           </div>
-          <div
-            className={getButtonClasses("daily")}
-            onClick={() => setActiveView("daily")}
-          >
+          <div className={getButtonClasses("daily")} onClick={() => setActiveView("daily")}>
             <span>Daily</span>
           </div>
         </div>
 
-
-        {/* Calendars Toggle */}
         <div className="mb-6">
           <div
             className="flex items-center justify-between mb-2 cursor-pointer"
             onClick={() => setShowCalendars(!showCalendars)}
           >
             <h3 className="text-xs font-bold text-[#222222]">Calendars</h3>
-            <span
-              className={`text-xs text-[#222222] transform transition-transform ${
-                showCalendars ? "" : "rotate-180"
-              }`}
-            >
+            <span className={`text-xs text-[#222222] transform transition-transform ${showCalendars ? "" : "rotate-180"}`}>
               ▾
             </span>
           </div>
           {showCalendars && (
             <ul className="space-y-2">
-              <li className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-[5px] bg-pink-400"></span>
-                <span className="text-sm text-[#222222]">NUEVA</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-[5px] bg-green-400"></span>
-                <span className="text-sm text-[#222222]">Calculus</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-[5px] bg-blue-400"></span>
-                <span className="text-sm text-[#222222]">Org. Bio. Lab</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-[5px] bg-yellow-400"></span>
-                <span className="text-sm text-[#222222]">Human Factors</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-4 h-4 rounded-[5px] bg-purple-400"></span>
-                <span className="text-sm text-[#222222]">Misc.</span>
-              </li>
-              <li className="flex items-center space-x-2 cursor-pointer" onClick={() => {/* trigger new calendar form */}}>
+              {[ 
+                { name: "NUEVA", color: "bg-pink-400" },
+                { name: "Calculus", color: "bg-green-400" },
+                { name: "Org. Bio. Lab", color: "bg-blue-400" },
+                { name: "Human Factors", color: "bg-yellow-400" },
+                { name: "Misc.", color: "bg-purple-400" },
+              ].map(({ name, color }) => (
+                <li
+                  key={name}
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={() => handleColorClick(color)}
+                >
+                  <span className={`w-4 h-4 rounded-[5px] ${color}`}></span>
+                  <span className="text-sm text-[#222222]">{name}</span>
+                </li>
+              ))}
+              <li className="flex items-center space-x-2 cursor-pointer">
                 <span className="w-4 h-4 rounded-[5px] bg-gray-400"></span>
                 <span className="text-sm text-[#222222] underline">New calendar...</span>
               </li>
@@ -128,8 +114,6 @@ const CalendarSite = () => {
           )}
         </div>
 
-
-        {/* User/Settings/Notifications Section */}
         <div className="mt-auto border-t border-gray-300 pt-4">
           <div className="flex items-center space-x-2 mb-2">
             <span className="text-sm text-[#222222]">🔔</span>
@@ -153,31 +137,31 @@ const CalendarSite = () => {
         </div>
       </div>
 
-
-      {/* Main Content Area with header & bottom gap */}
       <div className="flex-1 flex flex-col">
-        {/* Header space */}
         <div className="h-[58px] flex justify-end">
-            <div>
-              <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1}/>
-              <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1}/>
-              <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px"/>
-            </div>
+          <div>
+            <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
+            <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1} />
+            <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />
+          </div>
         </div>
-        <main className="w-[1278px] h-[666] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
-          {activeView === "monthly" && <MonthlyPage />}
-          {activeView === "weekly" && <WeeklyPage />}
-          {activeView === "daily" && <DailyPage />}
+        <main className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
+          {activeView === "monthly" && (
+            <MonthlyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
+          )}
+          {activeView === "weekly" && (
+            <WeeklyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
+          )}
+          {activeView === "daily" && (
+            <DailyPage selectedColor={selectedColor} clearSelectedColor={clearSelectedColor} />
+          )}
         </main>
-        {/* Bottom gap */}
         <div className="h-0"></div>
       </div>
 
-      {/* User Settings Modal */}
       {showUserSettings && (
         <div className="fixed inset-0 backdrop-blur-[2px] flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
-            {/* Close Button */}
             <button
               className="absolute top-3 right-3 text-gray-600 text-xl"
               onClick={() => setShowUserSettings(false)}
