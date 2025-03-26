@@ -54,6 +54,7 @@ const ToDoList = ({
       );
       clearSelectedColor();
     }
+    
   };
 
   return (

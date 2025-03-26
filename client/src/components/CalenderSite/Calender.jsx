@@ -24,6 +24,8 @@ const CalendarSite = () => {
   const [newCalendarName, setNewCalendarName] = useState("");
   const [newCalendarColor, setNewCalendarColor] = useState("#f472b6");
   const [customCalendars, setCustomCalendars] = useState([]);
+  const [tempCalendars, setTempCalendars] = useState([]);
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

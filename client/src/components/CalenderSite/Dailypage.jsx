@@ -32,7 +32,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor }) => {
       </div>
       <ToDoList
         weekText="FUTURE MONTHS"
-        customHeight="643px"
+        customHeight="785px"
         customTitleWidth="205px"
         customFontSize="20px"
         selectedColor={selectedColor}
