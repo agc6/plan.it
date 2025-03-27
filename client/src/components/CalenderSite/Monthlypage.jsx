@@ -53,10 +53,11 @@ const generateWeeksForCurrentMonth = () => {
   return weeks;
 };
 
-const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView }) => {
+const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek }) => {
   const weeks = generateWeeksForCurrentMonth();
 
-  const handleWeekClick = () => {
+  const handleWeekClick = (weekNumber) => {
+    setSelectedWeek(weekNumber);
     setActiveView("weekly");
   };
 
@@ -119,6 +120,7 @@ MonthlyPage.propTypes = {
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
   setActiveView: PropTypes.func,
+  setSelectedWeek: PropTypes.func,
 };
 
 export default MonthlyPage;

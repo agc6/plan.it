@@ -1,54 +1,42 @@
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
-const Weeklypage = ({ selectedColor, clearSelectedColor }) => {
+const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-indexed
+
+  const startDay = (selectedWeek - 1) * 7 + 1;
+  const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const dayOfMonth = startDay + i;
+    if (dayOfMonth > lastDayOfMonth) break;
+
+    const date = new Date(year, month, dayOfMonth);
+    days.push({
+      weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
+      formattedDate: date.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+      }),
+      dayOfMonth,
+    });
+  }
+
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row">
-        <ToDoList
-          weekText="DAY 1"
-          dateRange="Day 1"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-        <ToDoList
-          weekText="DAY 2"
-          dateRange="Day 2"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-        <ToDoList
-          weekText="DAY 3"
-          dateRange="Day 3"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-      </div>
-      <div className="flex flex-row">
-        <ToDoList
-          weekText="DAY 4"
-          dateRange="Day 4"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-        <ToDoList
-          weekText="DAY 5"
-          dateRange="Day 5"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-        <ToDoList
-          weekText="DAY 6"
-          dateRange="Day 6"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
-        <ToDoList
-          weekText="DAY 7"
-          dateRange="Day 7"
-          selectedColor={selectedColor}
-          clearSelectedColor={clearSelectedColor}
-        />
+      <div className="flex flex-row flex-wrap">
+        {days.map((day, idx) => (
+          <ToDoList
+            key={idx}
+            weekText={day.weekday}
+            dateRange={`Day ${day.dayOfMonth} (${day.formattedDate})`}
+            selectedColor={selectedColor}
+            clearSelectedColor={clearSelectedColor}
+          />
+        ))}
       </div>
     </div>
   );
@@ -57,6 +45,7 @@ const Weeklypage = ({ selectedColor, clearSelectedColor }) => {
 Weeklypage.propTypes = {
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
+  selectedWeek: PropTypes.number,
 };
 
 export default Weeklypage;

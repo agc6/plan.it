@@ -1,8 +1,25 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
 
-const Dailypage = ({ selectedColor, clearSelectedColor }) => {
+const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  // Default to today's date if no selectedWeek provided
+  const currentDayNumber = selectedWeek
+    ? (selectedWeek - 1) * 7 + today.getDate() % 7 || 1
+    : today.getDate();
+
+  const currentDate = new Date(year, month, currentDayNumber);
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -16,6 +33,9 @@ const Dailypage = ({ selectedColor, clearSelectedColor }) => {
   return (
     <div className="flex px-6 py-4">
       <div className="w-[80%] max-h-[800px] overflow-y-scroll border rounded-md bg-white shadow-sm mr-6">
+        <div className="sticky top-0 z-10 bg-white p-4 border-b text-lg font-bold">
+          {formattedDate}
+        </div>
         {hours.map((hour) => (
           <div
             key={hour}
@@ -42,6 +62,10 @@ const Dailypage = ({ selectedColor, clearSelectedColor }) => {
   );
 };
 
+Dailypage.propTypes = {
+  selectedColor: PropTypes.string,
+  clearSelectedColor: PropTypes.func,
+  selectedWeek: PropTypes.number,
+};
+
 export default Dailypage;
-
-
