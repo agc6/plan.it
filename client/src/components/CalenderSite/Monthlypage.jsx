@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 import ToDoList from "./ToDoList";
 
 const generateWeeksForCurrentMonth = () => {
@@ -54,12 +53,11 @@ const generateWeeksForCurrentMonth = () => {
   return weeks;
 };
 
-const MonthlyPage = ({ selectedColor, clearSelectedColor }) => {
-  const navigate = useNavigate();
+const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView }) => {
   const weeks = generateWeeksForCurrentMonth();
 
   const handleWeekClick = () => {
-    navigate("/weekly");
+    setActiveView("weekly");
   };
 
   return (
@@ -120,6 +118,7 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor }) => {
 MonthlyPage.propTypes = {
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
+  setActiveView: PropTypes.func,
 };
 
 export default MonthlyPage;

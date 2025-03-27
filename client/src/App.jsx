@@ -4,9 +4,9 @@ import Hero from "./components/Hero";
 import Features from "./components/Features";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
-import GetStarted from "./pages/GetStarted"; // Sign In/Sign Up page
-import LogIn from "./pages/LogIn"; // Login page
-import Calender from "./components/CalenderSite/Calender";  // Calendar page
+import GetStarted from "./pages/GetStarted";
+import LogIn from "./pages/LogIn";
+import Calender from "./components/CalenderSite/Calender";
 
 function App() {
   return (
@@ -25,7 +25,6 @@ function App() {
       />
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<LogIn />} />
-      {/* Calendar route */}
       <Route path="/calendar" element={<Calender />} />
     </Routes>
   );

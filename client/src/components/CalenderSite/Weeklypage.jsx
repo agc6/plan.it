@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
 const Weeklypage = ({ selectedColor, clearSelectedColor }) => {
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-row">
