@@ -2,16 +2,61 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import ToDoList from "./ToDoList";
 
+const generateWeeksForCurrentMonth = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0); // Last day of current month
+
+  const weeks = [];
+  let start = new Date(firstDay);
+
+  while (start <= lastDay) {
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+
+    // Clamp end to the last day of the month
+    if (end > lastDay) {
+      end.setTime(lastDay.getTime());
+    }
+
+    const format = (d) =>
+      `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+
+    weeks.push({
+      weekText: `WEEK ${weeks.length + 1}`,
+      dateRange: `${format(start)} ─ ${format(end)}`,
+      weekNumber: weeks.length + 1,
+    });
+
+    // Move to next week
+    start.setDate(start.getDate() + 7);
+  }
+  if (weeks[3]) {
+    weeks[3] = {
+      ...weeks[3],
+      customHeight: "263px",
+      customWidth: "453px",
+      customLeftDatePadding: "180px",
+    };
+  }
+  if (weeks[4]) {
+    weeks[4] = {
+      ...weeks[4],
+      customHeight: "263px",
+      customWidth: "453px",
+      customLeftDatePadding: "180px",
+    };
+  }
+
+  return weeks;
+};
+
 const MonthlyPage = ({ selectedColor, clearSelectedColor }) => {
   const navigate = useNavigate();
-
-  const weeks = [
-    { weekText: "WEEK 1", dateRange: "12/30 ─ 01/05", weekNumber: 1 },
-    { weekText: "WEEK 2", dateRange: "01/06 ─ 01/12", weekNumber: 2 },
-    { weekText: "WEEK 3", dateRange: "01/13 ─ 01/19", weekNumber: 3 },
-    { weekText: "WEEK 4", dateRange: "01/20 ─ 01/26", weekNumber: 4, customHeight: "263px", customWidth: "453px", customLeftDatePadding: "180px" },
-    { weekText: "WEEK 5", dateRange: "01/27 ─ 01/31", weekNumber: 5, customHeight: "263px", customWidth: "453px", customLeftDatePadding: "180px" }
-  ];
+  const weeks = generateWeeksForCurrentMonth();
 
   const handleWeekClick = () => {
     navigate("/weekly");
@@ -25,7 +70,10 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor }) => {
             <ToDoList
               key={week.weekText}
               weekText={
-                <span onClick={() => handleWeekClick(week.weekNumber)} className="cursor-pointer hover:underline">
+                <span
+                  onClick={() => handleWeekClick(week.weekNumber)}
+                  className="cursor-pointer hover:underline"
+                >
                   {week.weekText}
                 </span>
               }
@@ -40,7 +88,10 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor }) => {
             <ToDoList
               key={week.weekText}
               weekText={
-                <span onClick={() => handleWeekClick(week.weekNumber)} className="cursor-pointer hover:underline">
+                <span
+                  onClick={() => handleWeekClick(week.weekNumber)}
+                  className="cursor-pointer hover:underline"
+                >
                   {week.weekText}
                 </span>
               }
