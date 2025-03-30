@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import MonthlyPage from "./Monthlypage";
 import WeeklyPage from "./WeeklyPage";
-import DailyPage from "./DailyPage";
+import DailyPage from "./Dailypage";
 import userIcon from "../../assets/user-icon.svg";
 import UserSettings from "../../pages/UserSettings";
 import CustomButton from "./CustomButton";
