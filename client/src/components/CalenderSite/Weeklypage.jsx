@@ -1,7 +1,10 @@
+import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
 const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
+  const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
+  
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed
@@ -25,6 +28,11 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
     });
   }
 
+  // Handle task movements between lists
+  const handleTaskMove = useCallback((taskId, sourceListId) => {
+    setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+  }, []);
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row flex-wrap">
@@ -35,6 +43,9 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
             dateRange={`Day ${day.dayOfMonth} (${day.formattedDate})`}
             selectedColor={selectedColor}
             clearSelectedColor={clearSelectedColor}
+            listId={`day-${day.dayOfMonth}`}
+            onDragTaskComplete={handleTaskMove}
+            removedTaskIds={removedTaskIds} 
           />
         ))}
       </div>

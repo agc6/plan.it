@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
@@ -55,53 +56,67 @@ const generateWeeksForCurrentMonth = () => {
 
 const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek }) => {
   const weeks = generateWeeksForCurrentMonth();
+  const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
 
   const handleWeekClick = (weekNumber) => {
     setSelectedWeek(weekNumber);
     setActiveView("weekly");
   };
 
+  // Handle task movements between lists
+  const handleTaskMove = useCallback((taskId, sourceListId) => {
+    // Mark this task as moved so the source list knows to remove it
+    setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+  }, []);
+
   return (
     <div className="flex flex-row">
       <div className="flex flex-col">
         <div className="flex flex-row">
-          {weeks.slice(0, 3).map((week) => (
-            <ToDoList
-              key={week.weekText}
-              weekText={
-                <span
-                  onClick={() => handleWeekClick(week.weekNumber)}
-                  className="cursor-pointer hover:underline"
-                >
-                  {week.weekText}
-                </span>
-              }
-              dateRange={week.dateRange}
-              selectedColor={selectedColor}
-              clearSelectedColor={clearSelectedColor}
-            />
-          ))}
+        {weeks.slice(0, 3).map((week) => (
+  <ToDoList
+    key={week.weekText}
+    weekText={
+      <span
+        onClick={() => handleWeekClick(week.weekNumber)}
+        className="cursor-pointer hover:underline"
+      >
+        {week.weekText}
+      </span>
+    }
+    dateRange={week.dateRange}
+    selectedColor={selectedColor}
+    clearSelectedColor={clearSelectedColor}
+    listId={`week-${week.weekNumber}`}
+    onDragTaskComplete={handleTaskMove}
+    removedTaskIds={removedTaskIds}
+  />
+))}
         </div>
         <div className="flex flex-row">
-          {weeks.slice(3, 5).map((week) => (
-            <ToDoList
-              key={week.weekText}
-              weekText={
-                <span
-                  onClick={() => handleWeekClick(week.weekNumber)}
-                  className="cursor-pointer hover:underline"
-                >
-                  {week.weekText}
-                </span>
-              }
-              dateRange={week.dateRange}
-              customHeight={week.customHeight}
-              customWidth={week.customWidth}
-              customLeftDatePadding={week.customLeftDatePadding}
-              selectedColor={selectedColor}
-              clearSelectedColor={clearSelectedColor}
-            />
-          ))}
+        {weeks.slice(3, 5).map((week) => (
+  <ToDoList
+    key={week.weekText}
+    weekText={
+      <span
+        onClick={() => handleWeekClick(week.weekNumber)}
+        className="cursor-pointer hover:underline"
+      >
+        {week.weekText}
+      </span>
+    }
+    dateRange={week.dateRange}
+    customHeight={week.customHeight}
+    customWidth={week.customWidth}
+    customLeftDatePadding={week.customLeftDatePadding}
+    selectedColor={selectedColor}
+    clearSelectedColor={clearSelectedColor}
+    listId={`week-${week.weekNumber}`}
+    onDragTaskComplete={handleTaskMove}
+    removedTaskIds={removedTaskIds}
+  />
+))}
+
         </div>
       </div>
       <ToDoList
@@ -111,6 +126,9 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
         customFontSize="20px"
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
+        listId="future-months"
+        onDragTaskComplete={handleTaskMove}
+        removedTaskIds={removedTaskIds} 
       />
     </div>
   );

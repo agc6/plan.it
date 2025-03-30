@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import PropTypes from "prop-types";
 
 const ToDoList = ({
@@ -11,6 +11,9 @@ const ToDoList = ({
   customLeftDatePadding,
   selectedColor = "",
   clearSelectedColor = () => {},
+  listId,
+  onDragTaskComplete,
+  removedTaskIds = new Set(),
 }) => {
   const heightToUse = customHeight || "358px";
   const widthToUse = customWidth || "293px";
@@ -19,6 +22,8 @@ const ToDoList = ({
   const leftDatePaddingToUse = customLeftDatePadding || "21px";
 
   const [taskInputs, setTaskInputs] = useState([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const listRef = useRef(null);
 
   const addNewTask = () => {
     const newTask = {
@@ -60,13 +65,71 @@ const ToDoList = ({
     if (selectedColor) {
       clearSelectedColor(); // Reset selected color after applying
     }
-    
   };
+
+  // Drag handlers
+  const handleDragStart = (e, taskId, taskData) => {
+    e.dataTransfer.setData("application/json", JSON.stringify({
+      taskId,
+      sourceListId: listId,
+      taskData
+    }));
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      const { taskId, sourceListId, taskData } = data;
+      
+      if (sourceListId === listId) {
+        // Task dropped in the same list
+        return;
+      }
+      
+      // Task dropped from another list
+      // Add the task to this list
+      setTaskInputs((prev) => [{
+        ...taskData,
+        id: Date.now(), // Assign a new ID
+        animate: true
+      }, ...prev]);
+      
+      // Notify parent that a task was moved
+      if (onDragTaskComplete) {
+        onDragTaskComplete(taskId, sourceListId, listId);
+      }
+    } catch (err) {
+      console.error("Error handling drop:", err);
+    }
+  };
+
+  // Filter out tasks that have been moved to other lists
+  const filteredTasks = taskInputs.filter(task => 
+    !removedTaskIds.has(`${listId}-${task.id}`)
+  );
 
   return (
     <div
-      className="relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 p-4"
+      ref={listRef}
+      className={`relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 p-4 
+        ${isDraggingOver ? "bg-blue-50" : ""}`}
       style={{ height: heightToUse, width: widthToUse }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {/* Header */}
       <div className="flex flex-row items-center rounded-t-[25px] h-12">
@@ -97,10 +160,12 @@ const ToDoList = ({
           paddingRight: "20px",
         }}
       >
-        {taskInputs.map((task) => (
+        {filteredTasks.map((task) => (
           <div
             key={task.id}
             className={`flex items-center space-x-3 mb-2 w-full ${task.color}`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, task.id, task)}
           >
             <button
               className="w-4 h-4 rounded-full border-2 border-black bg-white cursor-pointer"
@@ -115,11 +180,12 @@ const ToDoList = ({
               onKeyDown={(e) => handleKeyDown(e, task.id)}
               className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform 
               ${task.animate ? "animate-slide-down" : ""} 
-              ${task.completed ? "line-through text-gray-500 opacity-60" : ""}`} // Strikethrough when completed
+              ${task.completed ? "line-through text-gray-500 opacity-60" : ""} 
+              cursor-grab`} // Add grab cursor for draggable items
               readOnly={task.completed} // Prevent editing when completed
               onAnimationEnd={() => {
-              setTaskInputs((prev) =>
-              prev.map((t) =>
+                setTaskInputs((prev) =>
+                  prev.map((t) =>
                     (t.id === task.id ? { ...t, animate: false } : t)
                   )
                 );
@@ -128,6 +194,11 @@ const ToDoList = ({
           </div>
         ))}
       </div>
+
+      {/* Drag indicator when hovering */}
+      {isDraggingOver && (
+        <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-t-[25px] rounded-b-[10px] pointer-events-none"></div>
+      )}
 
       {/* Add Button */}
       <button
@@ -182,7 +253,7 @@ const ToDoList = ({
 };
 
 ToDoList.propTypes = {
-  weekText: PropTypes.string,
+  weekText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   dateRange: PropTypes.string,
   customHeight: PropTypes.string,
   customTitleWidth: PropTypes.string,
@@ -191,6 +262,9 @@ ToDoList.propTypes = {
   customLeftDatePadding: PropTypes.string,
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
+  listId: PropTypes.string, // Required for drag and drop
+  onDragTaskComplete: PropTypes.func, // Callback for successful task drops
+  removedTaskIds: PropTypes.instanceOf(Set),
 };
 
 export default ToDoList;
