@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
 
 const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
+  const [currentHour, setCurrentHour] = useState(new Date().getHours());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+    setCurrentHour(new Date().getHours());
+    }, 60000);
+    return () => clearInterval(interval);
+    }, []);
 
   const today = new Date();
   const year = today.getFullYear();
@@ -43,7 +51,10 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
             onMouseEnter={() => setHoveredHour(hour)}
             onMouseLeave={() => setHoveredHour(null)}
           >
-            <div className="text-base font-medium text-gray-700 mb-2">{formatHour(hour)}</div>
+            <div className={`text-base font-medium mb-2 ${hour ===
+            currentHour ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
+            {formatHour(hour)}
+            </div>
             {hoveredHour === hour && (
               <div className="text-xs italic text-gray-400">Task drop zone or interaction placeholder</div>
             )}
