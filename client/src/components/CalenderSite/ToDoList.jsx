@@ -46,13 +46,19 @@ const ToDoList = ({
   };
 
   const handleCircleClick = (id) => {
-    if (selectedColor) {
-      setTaskInputs((prev) =>
-        prev.map((task) =>
-          task.id === id ? { ...task, color: selectedColor } : task
+    setTaskInputs((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              completed: !task.completed, // Toggle completion
+              color: selectedColor || task.color, // Keep existing color or apply selected color
+            }
+          : task
         )
       );
-      clearSelectedColor();
+    if (selectedColor) {
+      clearSelectedColor(); // Reset selected color after applying
     }
     
   };
@@ -107,13 +113,14 @@ const ToDoList = ({
               value={task.text}
               onChange={(e) => handleChange(e, task.id)}
               onKeyDown={(e) => handleKeyDown(e, task.id)}
-              className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform ${
-                task.animate ? "animate-slide-down" : ""
-              }`}
+              className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform 
+              ${task.animate ? "animate-slide-down" : ""} 
+              ${task.completed ? "line-through text-gray-500 opacity-60" : ""}`} // Strikethrough when completed
+              readOnly={task.completed} // Prevent editing when completed
               onAnimationEnd={() => {
-                setTaskInputs((prev) =>
-                  prev.map((t) =>
-                    t.id === task.id ? { ...t, animate: false } : t
+              setTaskInputs((prev) =>
+              prev.map((t) =>
+                    (t.id === task.id ? { ...t, animate: false } : t)
                   )
                 );
               }}
