@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
 
 const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
+  const [hourTasks, setHourTasks] = useState({});
+  const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,6 +40,54 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
     return `${hour - 12} PM`;
   };
 
+  // Handle drag and drop for hour slots
+  const handleDragOver = (e, hour) => {
+    e.preventDefault();
+    setHoveredHour(hour);
+  };
+
+  const handleDrop = useCallback((e, hour) => {
+    e.preventDefault();
+    setHoveredHour(null);
+    
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      const { taskId, sourceListId, taskData } = data;
+      
+      // Add task to this hour
+      setHourTasks(prev => ({
+        ...prev,
+        [hour]: [...(prev[hour] || []), {
+          ...taskData,
+          id: Date.now(), // Generate new ID
+          hourAssigned: hour,
+        }]
+      }));
+      
+      // Mark original task as removed
+      setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+    } catch (err) {
+      console.error("Error handling drop on hour:", err);
+    }
+  }, []);
+
+  // Handle removal of tasks when they're moved elsewhere
+  const handleTaskMove = useCallback((taskId, sourceListId) => {
+    // We only need to handle tasks moved from hour slots
+    if (sourceListId.startsWith('hour-')) {
+      const hourNum = parseInt(sourceListId.split('-')[1]);
+      
+      setHourTasks(prev => {
+        if (!prev[hourNum]) return prev;
+        
+        return {
+          ...prev,
+          [hourNum]: prev[hourNum].filter(task => task.id !== taskId)
+        };
+      });
+    }
+  }, []);
+
   return (
     <div className="flex px-6 py-4">
       <div className="w-[80%] max-h-[800px] overflow-y-scroll border rounded-md bg-white shadow-sm mr-6">
@@ -47,27 +97,60 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
         {hours.map((hour) => (
           <div
             key={hour}
-            className="border-b border-dotted border-gray-300 px-6 py-4 relative hover:bg-gray-50"
+            className={`border-b border-dotted border-gray-300 px-6 py-4 relative 
+              ${hoveredHour === hour ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
             onMouseEnter={() => setHoveredHour(hour)}
             onMouseLeave={() => setHoveredHour(null)}
+            onDragOver={(e) => handleDragOver(e, hour)}
+            onDrop={(e) => handleDrop(e, hour)}
           >
-            <div className={`text-base font-medium mb-2 ${hour ===
-            currentHour ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
-            {formatHour(hour)}
+            <div className={`text-base font-medium mb-2 ${hour === currentHour ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
+              {formatHour(hour)}
             </div>
+            
+            {/* Tasks assigned to this hour */}
+            {hourTasks[hour] && hourTasks[hour].length > 0 && (
+              <div className="space-y-2 mb-2">
+                {hourTasks[hour].map(task => (
+                  <div 
+                    key={task.id}
+                    className={`flex items-center p-2 rounded ${task.color || 'bg-blue-100'}`}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("application/json", JSON.stringify({
+                        taskId: task.id,
+                        sourceListId: `hour-${hour}`,
+                        taskData: task
+                      }));
+                    }}
+                  >
+                    <div className="w-3 h-3 rounded-full border border-gray-400 mr-2"></div>
+                    <div className={task.completed ? 'line-through text-gray-500' : ''}>
+                      {task.text || 'Untitled Task'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             {hoveredHour === hour && (
-              <div className="text-xs italic text-gray-400">Task drop zone or interaction placeholder</div>
+              <div className="text-xs italic text-gray-500 border border-dashed border-gray-300 p-2 rounded">
+                Drop tasks here
+              </div>
             )}
           </div>
         ))}
       </div>
       <ToDoList
-        weekText="FUTURE MONTHS"
+        weekText="TASKS"
         customHeight="785px"
         customTitleWidth="205px"
         customFontSize="20px"
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
+        listId="daily-tasks"
+        onDragTaskComplete={handleTaskMove}
+        removedTaskIds={removedTaskIds} 
       />
     </div>
   );
