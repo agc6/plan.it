@@ -124,7 +124,7 @@ const ToDoList = ({
   return (
     <div
       ref={listRef}
-      className={`relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 p-4 
+      className={`relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 
         ${isDraggingOver ? "bg-blue-50" : ""}`}
       style={{ height: heightToUse, width: widthToUse }}
       onDragOver={handleDragOver}
