@@ -61,6 +61,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
       const { taskId, sourceListId, taskData } = data;
 
+      // Add the task to the target hour
       setHourTasks(prev => ({
         ...prev,
         [hour]: [...(prev[hour] || []), {
@@ -70,7 +71,22 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
         }]
       }));
 
-      setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+      // If the source is another hour slot, remove it from there
+      if (sourceListId.startsWith('hour-')) {
+        const sourceHour = parseInt(sourceListId.split('-')[1]);
+        
+        setHourTasks(prev => {
+          if (!prev[sourceHour]) return prev;
+          
+          return {
+            ...prev,
+            [sourceHour]: prev[sourceHour].filter(task => task.id !== parseInt(taskId))
+          };
+        });
+      } else {
+        // For tasks coming from ToDoList components (not hour slots)
+        setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+      }
     } catch (err) {
       console.error("Error handling drop on hour:", err);
     }
