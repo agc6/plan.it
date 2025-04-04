@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const CustomButton = ({ customIcon, selectedIcon, marginRight }) => {
-  const [isHovered, setIsHovered] = useState(false); // not hovered by default
-  const [isClicked, setIsClicked] = useState(false); // not clicked by default
+const CustomButton = ({ customIcon, selectedIcon, marginRight, onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
 
-  const handleClick = () => {
-    setIsClicked(!isClicked); // Toggle clicked state
+  const handleClick = (e) => {
+    setIsClicked(!isClicked); // local visual click style
+    if (onClick) {
+      onClick(e); // 👈 call the parent toggle!
+    }
   };
 
   return (
@@ -29,11 +32,12 @@ const CustomButton = ({ customIcon, selectedIcon, marginRight }) => {
   );
 };
 
-//place prop types after the component definition
 CustomButton.propTypes = {
   customIcon: PropTypes.string.isRequired,
   selectedIcon: PropTypes.string.isRequired,
   marginRight: PropTypes.string,
+  onClick: PropTypes.func, // ✅ include this
 };
 
 export default CustomButton;
+

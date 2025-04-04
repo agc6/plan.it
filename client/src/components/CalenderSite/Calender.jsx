@@ -11,6 +11,7 @@ import customizeIcon0 from "../../assets/customizeStyle0.svg";
 import customizeIcon1 from "../../assets/customizeStyle1.svg";
 import darkModeIcon0 from "../../assets/darkMode0.svg";
 import darkModeIcon1 from "../../assets/darkMode1.svg";
+import { motion, AnimatePresence } from "framer-motion";
 
 const getCurrentWeekOfMonth = () => {
   const today = new Date();
@@ -32,6 +33,32 @@ const CalendarSite = () => {
   const [newCalendarColor, setNewCalendarColor] = useState("#f472b6");
   const [customCalendars, setCustomCalendars] = useState([]);
   const [tempCalendars, setTempCalendars] = useState([]);
+  const [showCustomizeBox, setShowCustomizeBox] = useState(false);
+  const [selectedFont, setSelectedFont] = useState("Arial");
+  const defaultBackgroundColor = "#EBEDF3";
+  const [showColorOptions, setShowColorOptions] = useState(false);
+  const [outerBackgroundColor, setOuterBackgroundColor] = useState("#EBEDF3");
+  const outerLayerColors = [
+    { name: "Ocean Blue", color: "#b0c9d8" },      // softer light blue      // soft muted teal
+    { name: "Olive Green", color: "#c9da9c" },     // calm olive pastel    // lighter rose pink
+    { name: "Soft Blush", color: "#ffe6f2" },      // gentle blush
+    { name: "Lilac Mist", color: "#e4def4" },      // soft lilac violet
+    { name: "Classic White", color: "#ffffff" },   // original white
+  ];
+  
+  const [mainBackgroundColor, setMainBackgroundColor] = useState("#ffffff");
+  const [showMainColorOptions, setShowMainColorOptions] = useState(false);
+  const defaultMainColor = "#ffffff";
+  const mainPanelColors = [
+    { name: "Lavender Fog", color: "#f4f0fa" },
+    { name: "Soft Cream", color: "#fff6e9" },
+    { name: "Sky Mist", color: "#e8f3fa" },
+    { name: "Rose Blush", color: "#ffeef2" },
+    { name: "Pale Mint", color: "#e7f8f2" },
+  ];
+  
+  
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -74,8 +101,131 @@ const CalendarSite = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#EBEDF3] relative">
-      <div className="w-64 bg-[#EBEDF3] flex flex-col m-4">
+    <div
+        className="flex h-screen relative"style={{backgroundColor: outerBackgroundColor,fontFamily: selectedFont, }}>
+
+
+    {/* Slide box centered and same width as main */}
+    <AnimatePresence>
+  {showCustomizeBox && (
+    <motion.div
+      key="customizeBox"
+      initial={{ x: 300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 300, opacity: 0 }}
+      transition={{
+        type: "tween",
+        duration: 0.4,
+        ease: "easeInOut",
+      }}
+      className="fixed top-[90px] right-1 w-[345px] bg-white rounded-[15px] shadow-md border border-gray-200 p-4 z-50"
+    >
+      <div className="flex flex-col space-y-4">
+
+        {/* Font Picker */}
+        <div className="flex flex-col">
+          <label htmlFor="fontSelect" className="text-sm text-gray-600 mb-1">Font</label>
+          <select
+            id="fontSelect"
+            value={selectedFont}
+            onChange={(e) => setSelectedFont(e.target.value)}
+            className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+          >
+            <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
+            <option value="Cursive" style={{ fontFamily: "Cursive" }}>Cursive</option>
+            <option value="Comic Sans MS" style={{ fontFamily: "Comic Sans MS" }}>Comic Sans</option>
+            <option value="Georgia" style={{ fontFamily: "Georgia" }}>Georgia</option>
+            <option value="Times New Roman" style={{ fontFamily: "Times New Roman" }}>Times New Roman</option>
+          </select>
+        </div>
+
+        {/* Outer Background Color Toggle */}
+        <div className="flex flex-col">
+          <button
+            onClick={() => setShowColorOptions((prev) => !prev)}
+            className="flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
+          >
+            Background <span>{showColorOptions ? "▾" : "▸"}</span>
+          </button>
+
+          <AnimatePresence>
+            {showColorOptions && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-2 flex flex-wrap gap-2"
+              >
+                {outerLayerColors.map(({ name, color }) => (
+                  <div
+                    key={name}
+                    title={name}
+                    onClick={() => setOuterBackgroundColor(color)}
+                    className="w-6 h-6 rounded-[4px] cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+                    style={{ backgroundColor: color }}
+                  ></div>
+                ))}
+                <button
+                  onClick={() => setOuterBackgroundColor(defaultBackgroundColor)}
+                  className="mt-2 px-2 py-1 border border-gray-300 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Reset Background
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Main Panel Color Toggle */}
+        <div className="flex flex-col">
+          <button
+            onClick={() => setShowMainColorOptions((prev) => !prev)}
+            className="flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
+          >
+            Main Panel <span>{showMainColorOptions ? "▾" : "▸"}</span>
+          </button>
+
+          <AnimatePresence>
+            {showMainColorOptions && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-2 flex flex-wrap gap-2"
+              >
+                {mainPanelColors.map(({ name, color }) => (
+                  <div
+                    key={name}
+                    title={name}
+                    onClick={() => setMainBackgroundColor(color)}
+                    className="w-6 h-6 rounded-[4px] cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+                    style={{ backgroundColor: color }}
+                  ></div>
+                ))}
+                <button
+                  onClick={() => setMainBackgroundColor(defaultMainColor)}
+                  className="mt-2 px-2 py-1 border border-gray-300 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Reset Panel
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
+          {/* End of adding white box to edit*/}
+
+          <div
+  className="w-64 flex flex-col m-4 rounded-xl shadow"style={{ backgroundColor: outerBackgroundColor }}>
+
         <div className="mb-6">
           <span className="text-2xl font-archivo font-bold text-[#222222]">Plan.it</span>
         </div>
@@ -138,14 +288,32 @@ const CalendarSite = () => {
       </div>
 
       <div className="flex-1 flex flex-col">
-        <div className="h-[58px] flex justify-end">
-          <div>
-            <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
-            <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1} />
-            <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />
-          </div>
-        </div>
-        <main className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
+      <div className="h-[58px] flex justify-end items-center pr-4">
+      {/*chnaged the code form here */}
+      <div className="flex items-center space-x-2">
+        <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
+
+        {/* Customize Button */}
+        <CustomButton
+          customIcon={customizeIcon0}
+          selectedIcon={customizeIcon1}
+          onClick={() => setShowCustomizeBox((prev) => !prev)}
+        />
+
+        <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />
+      </div>
+    </div>
+{/* here */}
+        <main
+          className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto"
+          style={{
+            fontFamily: selectedFont,
+            backgroundColor: mainBackgroundColor,
+          }}
+        >
+
+
+
           {activeView === "monthly" && (
             <MonthlyPage
               selectedColor={selectedColor}
