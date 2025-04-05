@@ -11,6 +11,7 @@ import customizeIcon0 from "../../assets/customizeStyle0.svg";
 import customizeIcon1 from "../../assets/customizeStyle1.svg";
 import darkModeIcon0 from "../../assets/darkMode0.svg";
 import darkModeIcon1 from "../../assets/darkMode1.svg";
+import favicon from "../../assets/favicon.svg";
 
 const getCurrentWeekOfMonth = () => {
   const today = new Date();
@@ -77,7 +78,11 @@ const CalendarSite = () => {
     <div className="flex h-screen bg-[#EBEDF3] relative">
       <div className="w-64 bg-[#EBEDF3] flex flex-col m-4">
         <div className="mb-6">
-          <span className="text-2xl font-archivo font-bold text-[#222222]">Plan.it</span>
+          {/* Logo */}
+            <div className="flex items-center space-x-2">
+                <img src={favicon} alt="Logo" className="w-7 h-7" />
+                <span className="text-2xl font-archivo font-bold text-[#222222]">Plan.it</span>
+            </div>
         </div>
 
         <div className="flex flex-col space-y-2 mb-6">
