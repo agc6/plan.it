@@ -20,6 +20,40 @@ const getCurrentWeekOfMonth = () => {
   return Math.floor(dayOffset / 7) + 1;
 };
 
+function formatDateWithSuffix(date) {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const day = date.getDate();
+  let dayWithSuffix;
+
+  if (day >= 11 && day <= 13) {
+    dayWithSuffix = day + "th";
+  } else {
+    switch (day % 10) {
+      case 1:
+        dayWithSuffix = day + "st";
+        break;
+      case 2:
+        dayWithSuffix = day + "nd";
+        break;
+      case 3:
+        dayWithSuffix = day + "rd";
+        break;
+      default:
+        dayWithSuffix = day + "th";
+    }
+  }
+
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${month} ${dayWithSuffix}, ${year}`;
+
+};
+
 const CalendarSite = () => {
   const [activeView, setActiveView] = useState("monthly");
   const [showCalendars, setShowCalendars] = useState(true);
@@ -33,6 +67,9 @@ const CalendarSite = () => {
   const [newCalendarColor, setNewCalendarColor] = useState("#f472b6");
   const [customCalendars, setCustomCalendars] = useState([]);
   const [tempCalendars, setTempCalendars] = useState([]);
+
+  const currentDate = new Date();
+  const formattedDate = formatDateWithSuffix(currentDate);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -145,6 +182,7 @@ const CalendarSite = () => {
       <div className="flex-1 flex flex-col">
         <div className="h-[58px] flex justify-end">
           <div>
+            <span className="pr-246 font-archivo font-extralight text-[20px] tracking-wide">{formattedDate}</span>
             <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
             <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1} />
             <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />

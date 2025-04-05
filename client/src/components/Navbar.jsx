@@ -13,7 +13,7 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <img src={favicon} alt="Logo" className="w-8 h-8" />
-          <h1 className="text-2xl font-bold text-black">plan.it</h1>
+          <h1 className="text-2xl font-bold text-black">Plan.it</h1>
         </div>
 
         {/* Desktop Navigation Links */}
