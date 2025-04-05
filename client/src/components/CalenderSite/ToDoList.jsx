@@ -260,6 +260,7 @@ ToDoList.propTypes = {
   customFontSize: PropTypes.string,
   customWidth: PropTypes.string,
   customLeftDatePadding: PropTypes.string,
+  customRightDatePadding: PropTypes.string,
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
   listId: PropTypes.string, // Required for drag and drop

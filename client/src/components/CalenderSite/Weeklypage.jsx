@@ -9,15 +9,35 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed
 
-  const startDay = (selectedWeek - 1) * 7 + 1;
-  const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+  const startDay = (selectedWeek - 1) * 7;
+  const lastDayOfMonth = startDay + 6;
 
   const days = [];
+
   for (let i = 0; i < 7; i++) {
     const dayOfMonth = startDay + i;
     if (dayOfMonth > lastDayOfMonth) break;
 
     const date = new Date(year, month, dayOfMonth);
+
+    const isWednesday = date.getDay() === 3; // 0 (Sun) to 6 (Sat)
+    const isThursday = date.getDay() === 4; // 0 (Sun) to 6 (Sat)
+
+    let customTitleWidth = 125;
+    let customLeftDatePadding = 100;
+
+    if (isWednesday) {
+      customTitleWidth = 170;
+    } else if (isThursday) {
+      customTitleWidth = 140;
+    }
+    
+    if (isWednesday) {
+      customLeftDatePadding = 55;
+    } else if (isThursday) {
+      customLeftDatePadding = 85;
+    }
+
     days.push({
       weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
       formattedDate: date.toLocaleDateString("en-US", {
@@ -25,6 +45,8 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
         day: "2-digit",
       }),
       dayOfMonth,
+      customTitleWidth,
+      customLeftDatePadding,
     });
   }
 
@@ -36,12 +58,22 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row flex-wrap">
+          <ToDoList
+            customHeight={310}
+            customWidth={295}
+            weekText={'Weekly Tasks'}
+            customTitleWidth={190}
+          />
         {days.map((day, idx) => (
           <ToDoList
             key={idx}
             weekText={day.weekday}
-            dateRange={`Day ${day.dayOfMonth} (${day.formattedDate})`}
+            dateRange={day.formattedDate}
             selectedColor={selectedColor}
+            customLeftDatePadding={day.customLeftDatePadding}
+            customHeight={310}
+            customWidth={295}
+            customTitleWidth={day.customTitleWidth}
             clearSelectedColor={clearSelectedColor}
             listId={`day-${day.dayOfMonth}`}
             onDragTaskComplete={handleTaskMove}
