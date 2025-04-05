@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
 
-const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
+const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [hourTasks, setHourTasks] = useState({});
@@ -169,6 +169,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
         listId="daily-tasks"
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds}
+        editMode={editMode}
       />
     </div>
   );

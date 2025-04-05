@@ -44,6 +44,8 @@ const CalendarSite = () => {
   const [showCustomizeBox, setShowCustomizeBox] = useState(false);
   const [showColorOptions, setShowColorOptions] = useState(false);
   const [showMainColorOptions, setShowMainColorOptions] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
 
 
   
@@ -159,7 +161,13 @@ const CalendarSite = () => {
           <div>
             <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
             <CustomButton customIcon={customizeIcon0}selectedIcon={customizeIcon1}onClick={() => setShowCustomizeBox((prev) => !prev)}/>
-            <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />
+            <CustomButton customIcon={editIcon0}selectedIcon={editIcon1}marginRight="20px"onClick={() => setEditMode(prev => !prev)}/>
+            {editMode && (
+  <div className="absolute top-20 right-6 bg-yellow-200 text-black px-3 py-1 rounded-md shadow-md text-sm">
+    ✏️ Edit Mode Enabled
+  </div>
+)}
+
           </div>
         </div>
 
@@ -189,6 +197,7 @@ const CalendarSite = () => {
           >
           {activeView === "monthly" && (
             <MonthlyPage
+              editMode={editMode}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
               setSelectedWeek={setSelectedWeek}
@@ -197,6 +206,7 @@ const CalendarSite = () => {
           )}
           {activeView === "weekly" && (
             <WeeklyPage
+              editMode={editMode}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
               selectedWeek={selectedWeek}
@@ -204,6 +214,7 @@ const CalendarSite = () => {
           )}
           {activeView === "daily" && (
             <DailyPage
+              editMode={editMode}
               selectedWeek={selectedWeek}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}

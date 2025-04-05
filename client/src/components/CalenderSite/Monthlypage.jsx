@@ -54,7 +54,7 @@ const generateWeeksForCurrentMonth = () => {
   return weeks;
 };
 
-const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek }) => {
+const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek, editMode }) => {
   const weeks = generateWeeksForCurrentMonth();
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
 
@@ -90,6 +90,7 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
     listId={`week-${week.weekNumber}`}
     onDragTaskComplete={handleTaskMove}
     removedTaskIds={removedTaskIds}
+    editMode={editMode}
   />
 ))}
         </div>
@@ -129,6 +130,7 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
         listId="future-months"
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds} 
+        editMode={editMode}
       />
     </div>
   );

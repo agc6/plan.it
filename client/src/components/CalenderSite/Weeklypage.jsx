@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
-const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
+const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }) => {
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
   
   const today = new Date();
@@ -45,7 +45,8 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek }) => {
             clearSelectedColor={clearSelectedColor}
             listId={`day-${day.dayOfMonth}`}
             onDragTaskComplete={handleTaskMove}
-            removedTaskIds={removedTaskIds} 
+            removedTaskIds={removedTaskIds}
+            editMode={editMode} 
           />
         ))}
       </div>
