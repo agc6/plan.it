@@ -94,7 +94,7 @@ const CalendarSite = () => {
       flex items-center
       w-[153px] h-[37px] px-2
       rounded-[8px]
-      text-sm text-[#222222]
+      text-sm text-[#222222] font-archivo
       cursor-pointer
     `;
     if (activeView === view) {
@@ -129,7 +129,10 @@ const CalendarSite = () => {
         </div>
 
         <div className="flex flex-col space-y-2 mb-6">
-          <div className={getButtonClasses("monthly")} onClick={() => setActiveView("monthly")}> <span>Monthly</span> </div>
+          <div className={getButtonClasses("monthly")} onClick={() => setActiveView("monthly")}>
+            {/*<img src={isClicked ? monthlyIcon1 : isHovered ? monthlyIcon1 : monthlyIcon0} className="pr-2"/>*/}
+            <span>Monthly</span>
+          </div>
           <div className={getButtonClasses("weekly")} onClick={() => setActiveView("weekly")}> <span>Weekly</span> </div>
           <div className={getButtonClasses("daily")} onClick={() => setActiveView("daily")}> <span>Daily</span> </div>
         </div>
