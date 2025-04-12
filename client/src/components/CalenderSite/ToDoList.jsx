@@ -14,7 +14,10 @@ const ToDoList = ({
   listId,
   onDragTaskComplete,
   removedTaskIds = new Set(),
+  editMode = false,  
 }) => {
+
+
   const heightToUse = customHeight || "358px";
   const widthToUse = customWidth || "293px";
   const titleWidthToUse = customTitleWidth || "125px";
@@ -186,11 +189,23 @@ const ToDoList = ({
               onAnimationEnd={() => {
                 setTaskInputs((prev) =>
                   prev.map((t) =>
-                    (t.id === task.id ? { ...t, animate: false } : t)
-                  )
+                    (t.id === task.id ? { ...t, animate: false } : t))
                 );
               }}
             />
+            {/*Show delete button only in edit mode */}
+              {editMode && (
+                <button
+                  className="w-4  h-4 bg-red-500 text-white rounded-full flex items-center justify-center ml-auto"
+                  title="Delete Task"
+                  onClick={() =>
+                    setTaskInputs((prev) => prev.filter((t) => t.id !== task.id))
+                  }
+                >
+                  ⛔
+                </button>
+              )}
+            
           </div>
         ))}
       </div>
@@ -263,9 +278,11 @@ ToDoList.propTypes = {
   customRightDatePadding: PropTypes.string,
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
-  listId: PropTypes.string, // Required for drag and drop
-  onDragTaskComplete: PropTypes.func, // Callback for successful task drops
+  listId: PropTypes.string,
+  onDragTaskComplete: PropTypes.func,
   removedTaskIds: PropTypes.instanceOf(Set),
+  editMode: PropTypes.bool, 
 };
+
 
 export default ToDoList;

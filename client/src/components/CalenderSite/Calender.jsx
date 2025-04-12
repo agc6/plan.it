@@ -11,6 +11,8 @@ import customizeIcon0 from "../../assets/customizeStyle0.svg";
 import customizeIcon1 from "../../assets/customizeStyle1.svg";
 import darkModeIcon0 from "../../assets/darkMode0.svg";
 import darkModeIcon1 from "../../assets/darkMode1.svg";
+import BrushCustomization from "./BrushCustomization";
+
 import dailyIcon0 from "../../assets/DailyIcon0.svg";
 import dailyIcon1 from "../../assets/DailyIcon1.svg";
 import weeklyIcon0 from "../../assets/WeeklyIcon0.svg";
@@ -73,6 +75,22 @@ const CalendarSite = () => {
   const [newCalendarColor, setNewCalendarColor] = useState("#f472b6");
   const [customCalendars, setCustomCalendars] = useState([]);
   const [tempCalendars, setTempCalendars] = useState([]);
+  const [selectedFont, setSelectedFont] = useState("Arial");
+
+  const [outerBackgroundColor, setOuterBackgroundColor] = useState("#EBEDF3");
+  const defaultBackgroundColor = "#EBEDF3";
+
+  const [mainBackgroundColor, setMainBackgroundColor] = useState("#ffffff");
+  const defaultMainColor = "#ffffff";
+  const [showCustomizeBox, setShowCustomizeBox] = useState(false);
+  const [showColorOptions, setShowColorOptions] = useState(false);
+  const [showMainColorOptions, setShowMainColorOptions] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
+
+
+  
+
 
   const currentDate = new Date();
   const formattedDate = formatDateWithSuffix(currentDate);
@@ -118,8 +136,8 @@ const CalendarSite = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#EBEDF3] relative">
-      <div className="w-64 bg-[#EBEDF3] flex flex-col m-4">
+    <div className="flex h-screen relative"style={{backgroundColor: outerBackgroundColor,fontFamily: selectedFont,}}>
+      <div className="w-64 flex flex-col m-4" style={{ backgroundColor: outerBackgroundColor }}>
         <div className="mb-6">
           {/* Logo */}
             <div className="flex items-center space-x-2">
@@ -190,16 +208,48 @@ const CalendarSite = () => {
 
       <div className="flex-1 flex flex-col">
         <div className="h-[58px] flex justify-end">
+          
           <div>
             <span className="pr-246 font-archivo font-extralight text-[20px] tracking-wide">{formattedDate}</span>
             <CustomButton customIcon={darkModeIcon0} selectedIcon={darkModeIcon1} />
-            <CustomButton customIcon={customizeIcon0} selectedIcon={customizeIcon1} />
-            <CustomButton customIcon={editIcon0} selectedIcon={editIcon1} marginRight="20px" />
+            <CustomButton customIcon={customizeIcon0}selectedIcon={customizeIcon1}onClick={() => setShowCustomizeBox((prev) => !prev)}/>
+            <CustomButton customIcon={editIcon0}selectedIcon={editIcon1}marginRight="20px"onClick={() => setEditMode(prev => !prev)}/>
+            {editMode && (
+  <div className="absolute top-20 right-6 bg-yellow-200 text-black px-3 py-1 rounded-md shadow-md text-sm">
+    ✏️ Edit Mode Enabled
+  </div>
+)}
+
           </div>
         </div>
-        <main className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 bg-white shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto">
+
+        {/*  Customization Panel */}
+        <BrushCustomization
+          selectedFont={selectedFont}
+          setSelectedFont={setSelectedFont}
+          outerBackgroundColor={outerBackgroundColor}
+          setOuterBackgroundColor={setOuterBackgroundColor}
+          defaultBackgroundColor={defaultBackgroundColor}
+          mainBackgroundColor={mainBackgroundColor}
+          setMainBackgroundColor={setMainBackgroundColor}
+          defaultMainColor={defaultMainColor}
+          showCustomizeBox={showCustomizeBox}   
+          showColorOptions={showColorOptions}
+          setShowColorOptions={setShowColorOptions}
+          showMainColorOptions={showMainColorOptions}
+          setShowMainColorOptions={setShowMainColorOptions}
+        />
+        
+        <main
+            className="w-[1278px] h-[666px] flex-1 m-1.75 mt-0 ml-0 shadow-lg rounded-t-[30px] rounded-b-[10px] overflow-auto"
+              style={{
+                backgroundColor: mainBackgroundColor,
+                fontFamily: selectedFont, // optional if already on root
+              }}
+          >
           {activeView === "monthly" && (
             <MonthlyPage
+              editMode={editMode}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
               setSelectedWeek={setSelectedWeek}
@@ -208,6 +258,7 @@ const CalendarSite = () => {
           )}
           {activeView === "weekly" && (
             <WeeklyPage
+              editMode={editMode}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
               selectedWeek={selectedWeek}
@@ -215,6 +266,7 @@ const CalendarSite = () => {
           )}
           {activeView === "daily" && (
             <DailyPage
+              editMode={editMode}
               selectedWeek={selectedWeek}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
