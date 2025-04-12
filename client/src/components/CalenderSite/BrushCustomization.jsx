@@ -1,5 +1,5 @@
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PropTypes from "prop-types";
 
 const BrushCustomization = ({
   selectedFont,
@@ -65,11 +65,15 @@ const BrushCustomization = ({
 
             {/* Outer Background Color Toggle */}
             <div className="flex flex-col">
-              <button
-                onClick={() => setShowColorOptions((prev) => !prev)}
+            <button 
+              onClick={() => setShowColorOptions((prev) => !prev)}
                 className="flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
               >
-                Background <span>{showColorOptions ? "▾" : "▸"}</span>
+                Background
+                <span className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded-sm border ml-2" style={{ backgroundColor: outerBackgroundColor }}></div>
+                  <span>{showColorOptions ? "▾" : "▸"}</span>
+                </span>
               </button>
               <AnimatePresence>
                 {showColorOptions && (
@@ -102,12 +106,16 @@ const BrushCustomization = ({
 
             {/* Main Panel Color Toggle */}
             <div className="flex flex-col">
-              <button
-                onClick={() => setShowMainColorOptions((prev) => !prev)}
-                className="flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Main Panel <span>{showMainColorOptions ? "▾" : "▸"}</span>
-              </button>
+            <button
+              onClick={() => setShowMainColorOptions((prev) => !prev)}
+              className="flex items-center justify-between px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition"
+            >
+              Main Panel
+              <span className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded-sm border ml-2" style={{ backgroundColor: mainBackgroundColor }}></div>
+                <span>{showMainColorOptions ? "▾" : "▸"}</span>
+              </span>
+            </button>
               <AnimatePresence>
                 {showMainColorOptions && (
                   <motion.div
@@ -141,6 +149,22 @@ const BrushCustomization = ({
       )}
     </AnimatePresence>
   );
+};
+
+BrushCustomization.propTypes = {
+  selectedFont: PropTypes.string.isRequired,
+  setSelectedFont: PropTypes.func.isRequired,
+  outerBackgroundColor: PropTypes.string.isRequired,
+  setOuterBackgroundColor: PropTypes.func.isRequired,
+  defaultBackgroundColor: PropTypes.string.isRequired,
+  mainBackgroundColor: PropTypes.string.isRequired,
+  setMainBackgroundColor: PropTypes.func.isRequired,
+  defaultMainColor: PropTypes.string.isRequired,
+  showCustomizeBox: PropTypes.bool.isRequired,
+  showColorOptions: PropTypes.bool.isRequired,
+  setShowColorOptions: PropTypes.func.isRequired,
+  showMainColorOptions: PropTypes.bool.isRequired,
+  setShowMainColorOptions: PropTypes.func.isRequired,
 };
 
 export default BrushCustomization;
