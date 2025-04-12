@@ -10,27 +10,29 @@ const Weeklypage = ({
   setSelectedDay,
   setActiveView
 }) => {
-
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
 
-  
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed
 
-  const startDay = (selectedWeek - 1) * 7;
-  const lastDayOfMonth = startDay + 6;
+  // Get the first day of the month
+  const firstOfMonth = new Date(year, month, 1);
+  const startOfCalendar = new Date(firstOfMonth);
+  startOfCalendar.setDate(firstOfMonth.getDate() - firstOfMonth.getDay()); // Sunday before month start
 
+  // Start of selected week
+  const weekStart = new Date(startOfCalendar);
+  weekStart.setDate(startOfCalendar.getDate() + (selectedWeek - 1) * 7);
+
+  // Build 7 days of the week
   const days = [];
-
   for (let i = 0; i < 7; i++) {
-    const dayOfMonth = startDay + i;
-    if (dayOfMonth > lastDayOfMonth) break;
+    const currentDay = new Date(weekStart);
+    currentDay.setDate(weekStart.getDate() + i);
 
-    const date = new Date(year, month, dayOfMonth);
-
-    const isWednesday = date.getDay() === 3;
-    const isThursday = date.getDay() === 4;
+    const isWednesday = currentDay.getDay() === 3;
+    const isThursday = currentDay.getDay() === 4;
 
     let customTitleWidth = 125;
     let customLeftDatePadding = 100;
@@ -42,12 +44,14 @@ const Weeklypage = ({
     else if (isThursday) customLeftDatePadding = 85;
 
     days.push({
-      weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
-      formattedDate: date.toLocaleDateString("en-US", {
+      weekday: currentDay.toLocaleDateString("en-US", { weekday: "long" }),
+      formattedDate: currentDay.toLocaleDateString("en-US", {
         month: "2-digit",
         day: "2-digit",
       }),
-      dayOfMonth,
+      year: currentDay.getFullYear(),
+      month: currentDay.getMonth(),
+      day: currentDay.getDate(),
       customTitleWidth,
       customLeftDatePadding,
     });
@@ -67,16 +71,19 @@ const Weeklypage = ({
           customTitleWidth={190}
         />
         {days.map((day, idx) => (
-          <div
-            key={idx}
-            onClick={() => {
-              setSelectedDay({ year, month, day: day.dayOfMonth });
-              setActiveView("daily");
-            }}
-            className="cursor-pointer"
-          >
+          <div key={idx}>
             <ToDoList
-              weekText={day.weekday}
+              weekText={
+                <span
+                  onClick={() => {
+                    setSelectedDay({ year: day.year, month: day.month, day: day.day });
+                    setActiveView("daily");
+                  }}
+                  className="cursor-pointer hover:underline"
+                >
+                  {day.weekday}
+                </span>
+              }
               dateRange={day.formattedDate}
               selectedColor={selectedColor}
               customLeftDatePadding={day.customLeftDatePadding}
@@ -84,7 +91,7 @@ const Weeklypage = ({
               customWidth={295}
               customTitleWidth={day.customTitleWidth}
               clearSelectedColor={clearSelectedColor}
-              listId={`day-${day.dayOfMonth}`}
+              listId={`day-${day.day}`}
               onDragTaskComplete={handleTaskMove}
               removedTaskIds={removedTaskIds}
               editMode={editMode}
