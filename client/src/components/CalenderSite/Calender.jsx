@@ -13,12 +13,12 @@ import darkModeIcon0 from "../../assets/darkMode0.svg";
 import darkModeIcon1 from "../../assets/darkMode1.svg";
 import BrushCustomization from "./BrushCustomization";
 
-import dailyIcon0 from "../../assets/DailyIcon0.svg";
-import dailyIcon1 from "../../assets/DailyIcon1.svg";
-import weeklyIcon0 from "../../assets/WeeklyIcon0.svg";
-import weeklyIcon1 from "../../assets/WeeklyIcon1.svg";
-import monthlyIcon0 from "../../assets/MonthlyIcon0.svg";
-import monthlyIcon1 from "../../assets/MonthlyIcon1.svg";
+//import dailyIcon0 from "../../assets/DailyIcon0.svg";
+///import dailyIcon1 from "../../assets/DailyIcon1.svg";
+//import weeklyIcon0 from "../../assets/WeeklyIcon0.svg";
+//import weeklyIcon1 from "../../assets/WeeklyIcon1.svg";
+//import monthlyIcon0 from "../../assets/MonthlyIcon0.svg";
+//import monthlyIcon1 from "../../assets/MonthlyIcon1.svg";
 import favicon from "../../assets/favicon.svg";
 
 const getCurrentWeekOfMonth = () => {
@@ -69,12 +69,12 @@ const CalendarSite = () => {
   const [userName, setUserName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekOfMonth());
+  const [selectedDay, setSelectedDay] = useState({ year: null, month: null, day: null });
 
   const [showNewCalendarModal, setShowNewCalendarModal] = useState(false);
   const [newCalendarName, setNewCalendarName] = useState("");
   const [newCalendarColor, setNewCalendarColor] = useState("#f472b6");
   const [customCalendars, setCustomCalendars] = useState([]);
-  const [tempCalendars, setTempCalendars] = useState([]);
   const [selectedFont, setSelectedFont] = useState("Arial");
 
   const [outerBackgroundColor, setOuterBackgroundColor] = useState("#EBEDF3");
@@ -262,14 +262,18 @@ const CalendarSite = () => {
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
               selectedWeek={selectedWeek}
-            />
+              setSelectedDay={setSelectedDay}
+              setActiveView={setActiveView}
+            />     
           )}
+
           {activeView === "daily" && (
             <DailyPage
               editMode={editMode}
               selectedWeek={selectedWeek}
               selectedColor={selectedColor}
               clearSelectedColor={clearSelectedColor}
+              selectedDay={selectedDay}
             />
           )}
         </main>

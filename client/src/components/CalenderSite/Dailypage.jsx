@@ -1,14 +1,24 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
 
-const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }) => {
+const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [hourTasks, setHourTasks] = useState({});
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
-
   const scrollRef = useRef(null);
+
+  // Fallback to today if selectedDay is null or uninitialized
+  const currentDate = selectedDay?.year != null
+    ? new Date(selectedDay.year, selectedDay.month, selectedDay.day)
+    : new Date();
+
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,25 +29,9 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 8 * 65; // More accurate, 8am SLOT
+      scrollRef.current.scrollTop = 8 * 65; // Scroll to 8AM
     }
   }, []);
-  
-
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-
-  const currentDayNumber = selectedWeek
-    ? (selectedWeek - 1) * 7 + today.getDate() % 7 || 1
-    : today.getDate();
-
-  const currentDate = new Date(year, month, currentDayNumber);
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -61,7 +55,6 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
       const { taskId, sourceListId, taskData } = data;
 
-      // Add the task to the target hour
       setHourTasks(prev => ({
         ...prev,
         [hour]: [...(prev[hour] || []), {
@@ -71,20 +64,16 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
         }]
       }));
 
-      // If the source is another hour slot, remove it from there
       if (sourceListId.startsWith('hour-')) {
         const sourceHour = parseInt(sourceListId.split('-')[1]);
-        
         setHourTasks(prev => {
           if (!prev[sourceHour]) return prev;
-          
           return {
             ...prev,
             [sourceHour]: prev[sourceHour].filter(task => task.id !== parseInt(taskId))
           };
         });
       } else {
-        // For tasks coming from ToDoList components (not hour slots)
         setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
       }
     } catch (err) {
@@ -95,10 +84,8 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
   const handleTaskMove = useCallback((taskId, sourceListId) => {
     if (sourceListId.startsWith('hour-')) {
       const hourNum = parseInt(sourceListId.split('-')[1]);
-
       setHourTasks(prev => {
         if (!prev[hourNum]) return prev;
-
         return {
           ...prev,
           [hourNum]: prev[hourNum].filter(task => task.id !== taskId)
@@ -113,6 +100,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
         <div className="sticky top-0 z-10 bg-white p-4 border-b text-lg font-bold">
           {formattedDate}
         </div>
+
         {hours.map((hour) => (
           <div
             key={hour}
@@ -159,6 +147,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
           </div>
         ))}
       </div>
+
       <ToDoList
         weekText="TASKS"
         customHeight="785px"
@@ -178,7 +167,12 @@ const Dailypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }
 Dailypage.propTypes = {
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
-  selectedWeek: PropTypes.number,
+  editMode: PropTypes.bool,
+  selectedDay: PropTypes.shape({
+    year: PropTypes.number,
+    month: PropTypes.number,
+    day: PropTypes.number,
+  }),
 };
 
 export default Dailypage;
