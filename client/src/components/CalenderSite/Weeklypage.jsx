@@ -16,20 +16,14 @@ const Weeklypage = ({
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed
 
-  // Get the first day of the month
-  const firstOfMonth = new Date(year, month, 1);
-  const startOfCalendar = new Date(firstOfMonth);
-  startOfCalendar.setDate(firstOfMonth.getDate() - firstOfMonth.getDay()); // Sunday before month start
-
-  // Start of selected week
-  const weekStart = new Date(startOfCalendar);
-  weekStart.setDate(startOfCalendar.getDate() + (selectedWeek - 1) * 7);
-
-  // Build 7 days of the week
   const days = [];
-  for (let i = 0; i < 7; i++) {
-    const currentDay = new Date(weekStart);
-    currentDay.setDate(weekStart.getDate() + i);
+
+  const startDay = (selectedWeek - 1) * 7 + 1;
+  const endDay = startDay + 6;
+  const lastDay = new Date(year, month + 1, 0).getDate(); // last day of the month
+
+  for (let dayOfMonth = startDay; dayOfMonth <= Math.min(endDay, lastDay); dayOfMonth++) {
+    const currentDay = new Date(year, month, dayOfMonth);
 
     const isWednesday = currentDay.getDay() === 3;
     const isThursday = currentDay.getDay() === 4;
@@ -49,9 +43,9 @@ const Weeklypage = ({
         month: "2-digit",
         day: "2-digit",
       }),
-      year: currentDay.getFullYear(),
-      month: currentDay.getMonth(),
-      day: currentDay.getDate(),
+      year,
+      month,
+      day: dayOfMonth,
       customTitleWidth,
       customLeftDatePadding,
     });
@@ -67,7 +61,7 @@ const Weeklypage = ({
         <ToDoList
           customHeight={310}
           customWidth={295}
-          weekText={'Weekly Tasks'}
+          weekText={"Weekly Tasks"}
           customTitleWidth={190}
         />
         {days.map((day, idx) => (
