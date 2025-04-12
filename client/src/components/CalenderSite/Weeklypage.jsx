@@ -2,8 +2,17 @@ import { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
 
-const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode }) => {
+const Weeklypage = ({
+  selectedColor,
+  clearSelectedColor,
+  selectedWeek,
+  editMode,
+  setSelectedDay,
+  setActiveView
+}) => {
+
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
+
   
   const today = new Date();
   const year = today.getFullYear();
@@ -20,23 +29,17 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode 
 
     const date = new Date(year, month, dayOfMonth);
 
-    const isWednesday = date.getDay() === 3; // 0 (Sun) to 6 (Sat)
-    const isThursday = date.getDay() === 4; // 0 (Sun) to 6 (Sat)
+    const isWednesday = date.getDay() === 3;
+    const isThursday = date.getDay() === 4;
 
     let customTitleWidth = 125;
     let customLeftDatePadding = 100;
 
-    if (isWednesday) {
-      customTitleWidth = 170;
-    } else if (isThursday) {
-      customTitleWidth = 140;
-    }
-    
-    if (isWednesday) {
-      customLeftDatePadding = 55;
-    } else if (isThursday) {
-      customLeftDatePadding = 85;
-    }
+    if (isWednesday) customTitleWidth = 170;
+    else if (isThursday) customTitleWidth = 140;
+
+    if (isWednesday) customLeftDatePadding = 55;
+    else if (isThursday) customLeftDatePadding = 85;
 
     days.push({
       weekday: date.toLocaleDateString("en-US", { weekday: "long" }),
@@ -50,7 +53,6 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode 
     });
   }
 
-  // Handle task movements between lists
   const handleTaskMove = useCallback((taskId, sourceListId) => {
     setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
   }, []);
@@ -58,28 +60,36 @@ const Weeklypage = ({ selectedColor, clearSelectedColor, selectedWeek, editMode 
   return (
     <div className="flex flex-col">
       <div className="flex flex-row flex-wrap">
-          <ToDoList
-            customHeight={310}
-            customWidth={295}
-            weekText={'Weekly Tasks'}
-            customTitleWidth={190}
-          />
+        <ToDoList
+          customHeight={310}
+          customWidth={295}
+          weekText={'Weekly Tasks'}
+          customTitleWidth={190}
+        />
         {days.map((day, idx) => (
-          <ToDoList
+          <div
             key={idx}
-            weekText={day.weekday}
-            dateRange={day.formattedDate}
-            selectedColor={selectedColor}
-            customLeftDatePadding={day.customLeftDatePadding}
-            customHeight={310}
-            customWidth={295}
-            customTitleWidth={day.customTitleWidth}
-            clearSelectedColor={clearSelectedColor}
-            listId={`day-${day.dayOfMonth}`}
-            onDragTaskComplete={handleTaskMove}
-            removedTaskIds={removedTaskIds}
-            editMode={editMode} 
-          />
+            onClick={() => {
+              setSelectedDay({ year, month, day: day.dayOfMonth });
+              setActiveView("daily");
+            }}
+            className="cursor-pointer"
+          >
+            <ToDoList
+              weekText={day.weekday}
+              dateRange={day.formattedDate}
+              selectedColor={selectedColor}
+              customLeftDatePadding={day.customLeftDatePadding}
+              customHeight={310}
+              customWidth={295}
+              customTitleWidth={day.customTitleWidth}
+              clearSelectedColor={clearSelectedColor}
+              listId={`day-${day.dayOfMonth}`}
+              onDragTaskComplete={handleTaskMove}
+              removedTaskIds={removedTaskIds}
+              editMode={editMode}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -90,6 +100,9 @@ Weeklypage.propTypes = {
   selectedColor: PropTypes.string,
   clearSelectedColor: PropTypes.func,
   selectedWeek: PropTypes.number,
+  editMode: PropTypes.bool,
+  setSelectedDay: PropTypes.func,
+  setActiveView: PropTypes.func,
 };
 
 export default Weeklypage;

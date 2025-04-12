@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import GetStarted from "./pages/GetStarted";
 import LogIn from "./pages/LogIn";
 import Calender from "./components/CalenderSite/Calender";
+import Dailypage from "./components/CalenderSite/Dailypage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/get-started" element={<GetStarted />} />
       <Route path="/login" element={<LogIn />} />
       <Route path="/calendar" element={<Calender />} />
+      <Route path="/day/:year/:month/:day" element={<Dailypage />} />
     </Routes>
   );
 }
