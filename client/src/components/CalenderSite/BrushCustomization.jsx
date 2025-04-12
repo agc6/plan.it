@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BrushCustomization = ({
@@ -32,6 +32,73 @@ const BrushCustomization = ({
     { name: "Pale Mint", color: "#e7f8f2" },
   ];
 
+  // Load user preferences when component mounts
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await fetch("http://localhost:5000/api/users/preferences", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token
+          }
+        });
+
+        if (response.ok) {
+          const preferences = await response.json();
+          if (preferences.font) setSelectedFont(preferences.font);
+          if (preferences.outerBackgroundColor) setOuterBackgroundColor(preferences.outerBackgroundColor);
+          if (preferences.mainBackgroundColor) setMainBackgroundColor(preferences.mainBackgroundColor);
+        }
+      } catch (error) {
+        console.error("Failed to load preferences:", error);
+      }
+    };
+
+    loadUserPreferences();
+  }, [setSelectedFont, setOuterBackgroundColor, setMainBackgroundColor]);
+
+  // Save preferences when they change
+  const savePreferences = async (preferences) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      await fetch("http://localhost:5000/api/users/preferences", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token
+        },
+        body: JSON.stringify(preferences)
+      });
+    } catch (error) {
+      console.error("Failed to save preferences:", error);
+    }
+  };
+
+  // Handle font change
+  const handleFontChange = (e) => {
+    const newFont = e.target.value;
+    setSelectedFont(newFont);
+    savePreferences({ font: newFont });
+  };
+
+  // Handle outer background color change
+  const handleOuterColorChange = (color) => {
+    setOuterBackgroundColor(color);
+    savePreferences({ outerBackgroundColor: color });
+  };
+
+  // Handle main panel color change
+  const handleMainColorChange = (color) => {
+    setMainBackgroundColor(color);
+    savePreferences({ mainBackgroundColor: color });
+  };
+
   return (
     <AnimatePresence>
       {showCustomizeBox && (
@@ -52,7 +119,7 @@ const BrushCustomization = ({
               <select
                 id="fontSelect"
                 value={selectedFont}
-                onChange={(e) => setSelectedFont(e.target.value)}
+                onChange={handleFontChange}
                 className="px-2 py-1 border border-gray-300 rounded-md text-sm"
               >
                 <option value="Arial" style={{ fontFamily: "Arial" }}>Arial</option>
@@ -84,13 +151,13 @@ const BrushCustomization = ({
                       <div
                         key={name}
                         title={name}
-                        onClick={() => setOuterBackgroundColor(color)}
+                        onClick={() => handleOuterColorChange(color)}
                         className="w-6 h-6 rounded-[4px] cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
                         style={{ backgroundColor: color }}
                       ></div>
                     ))}
                     <button
-                      onClick={() => setOuterBackgroundColor(defaultBackgroundColor)}
+                      onClick={() => handleOuterColorChange(defaultBackgroundColor)}
                       className="mt-2 px-2 py-1 border border-gray-300 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition"
                     >
                       Reset Background
@@ -121,13 +188,13 @@ const BrushCustomization = ({
                       <div
                         key={name}
                         title={name}
-                        onClick={() => setMainBackgroundColor(color)}
+                        onClick={() => handleMainColorChange(color)}
                         className="w-6 h-6 rounded-[4px] cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
                         style={{ backgroundColor: color }}
                       ></div>
                     ))}
                     <button
-                      onClick={() => setMainBackgroundColor(defaultMainColor)}
+                      onClick={() => handleMainColorChange(defaultMainColor)}
                       className="mt-2 px-2 py-1 border border-gray-300 rounded-md text-xs text-gray-700 hover:bg-gray-100 transition"
                     >
                       Reset Panel

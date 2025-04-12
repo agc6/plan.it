@@ -13,23 +13,23 @@ const GetStarted = () => {
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
 
   // Handle form submission
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); // Reset previous errors
+const handleSignupSubmit = async (e) => {
+  e.preventDefault();
+  setError(""); // Reset previous errors
 
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupData),
-      });
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(signupData),
+    });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Registration failed");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Registration failed");
 
-      // Save user token and info
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+    // Save user token and info if they're in the response
+    if (data.token) localStorage.setItem("token", data.token);
+    if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
       // Redirect to the calendar page
       navigate("/calendar");

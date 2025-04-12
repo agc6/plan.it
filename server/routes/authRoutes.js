@@ -5,7 +5,7 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// Register User
+// Register User - Updated to include default preferences
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -18,17 +18,43 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
-    const user = new User({ name, email, password: hashedPassword });
+    // Create new user with preferences
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      preferences: {
+        font: "Arial", // Default font
+        outerBackgroundColor: "", // Empty string means use system default
+        mainBackgroundColor: ""  // Empty string means use system default
+      }
+    });
+
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    // Generate token for automatic login after registration
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    
+    // Create user response object without password
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      preferences: user.preferences
+    };
+
+    // Return token and user info for automatic login
+    res.status(201).json({ 
+      message: "User registered successfully", 
+      token, 
+      user: userResponse 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Login User
+// authRoutes.js - Update login route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -39,7 +65,16 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token, user });
+    
+    // Include user object with preferences but exclude password
+    const userResponse = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      preferences: user.preferences
+    };
+    
+    res.json({ token, user: userResponse });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

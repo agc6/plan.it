@@ -4,6 +4,7 @@ const mongoose = require("./connection"); // Connects to MongoDB
 const cors = require("cors");
 
 const authRoutes = require("./routes/authRoutes"); //Handles authentication
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes); // Adds authentication routes
+app.use("/api/users", userRoutes);
 
 // Default route
 app.get("/", (req, res) => {
