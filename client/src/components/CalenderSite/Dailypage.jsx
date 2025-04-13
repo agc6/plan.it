@@ -1,18 +1,34 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
+import { useTaskContext } from './TaskContext';
 
 const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [hourTasks, setHourTasks] = useState({});
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
   const scrollRef = useRef(null);
 
-  // Fallback to today if selectedDay is null or uninitialized
+  const { activeWeek, tasksByWeek, assignTaskHour } = useTaskContext();
+
   const currentDate = selectedDay?.year != null
     ? new Date(selectedDay.year, selectedDay.month, selectedDay.day)
     : new Date();
+
+  const currentDateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+  // Tasks that have not yet been assigned to an hour
+  const unassignedTasks = (tasksByWeek?.[activeWeek]?.[currentDateKey] || []).filter(task => task.hour == null);
+  
+  // Organize hour-assigned tasks into buckets
+  const hourTasks = tasksByWeek?.[activeWeek]?.[currentDateKey]?.reduce((acc, task) => {
+    if (task.hour !== undefined) {
+      const hour = task.hour;
+      if (!acc[hour]) acc[hour] = [];
+      acc[hour].push(task);
+    }
+    return acc;
+  }, {}) || {};
 
   const formattedDate = currentDate.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -29,7 +45,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 8 * 65; // Scroll to 8AM
+      scrollRef.current.scrollTop = 8 * 65; // scroll to 8AM
     }
   }, []);
 
@@ -53,45 +69,15 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
 
     try {
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
-      const { taskId, sourceListId, taskData } = data;
-
-      setHourTasks(prev => ({
-        ...prev,
-        [hour]: [...(prev[hour] || []), {
-          ...taskData,
-          id: Date.now(),
-          hourAssigned: hour,
-        }]
-      }));
-
-      if (sourceListId.startsWith('hour-')) {
-        const sourceHour = parseInt(sourceListId.split('-')[1]);
-        setHourTasks(prev => {
-          if (!prev[sourceHour]) return prev;
-          return {
-            ...prev,
-            [sourceHour]: prev[sourceHour].filter(task => task.id !== parseInt(taskId))
-          };
-        });
-      } else {
-        setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
-      }
+      const { taskId } = data;
+      assignTaskHour(activeWeek, currentDateKey, taskId, hour);
     } catch (err) {
       console.error("Error handling drop on hour:", err);
     }
-  }, []);
+  }, [assignTaskHour, activeWeek, currentDateKey]);
 
-  const handleTaskMove = useCallback((taskId, sourceListId) => {
-    if (sourceListId.startsWith('hour-')) {
-      const hourNum = parseInt(sourceListId.split('-')[1]);
-      setHourTasks(prev => {
-        if (!prev[hourNum]) return prev;
-        return {
-          ...prev,
-          [hourNum]: prev[hourNum].filter(task => task.id !== taskId)
-        };
-      });
-    }
+  const handleTaskMove = useCallback((taskId) => {
+    console.log(taskId); // Can be expanded later for cleanup
   }, []);
 
   return (
@@ -124,9 +110,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
                     draggable
                     onDragStart={(e) => {
                       e.dataTransfer.setData("application/json", JSON.stringify({
-                        taskId: task.id,
-                        sourceListId: `hour-${hour}`,
-                        taskData: task
+                        taskId: task.id
                       }));
                     }}
                   >
@@ -148,6 +132,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
         ))}
       </div>
 
+      {/* ✅ TASK PANEL with unassigned tasks */}
       <ToDoList
         weekText="TASKS"
         customHeight="785px"
@@ -158,7 +143,10 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
         listId="daily-tasks"
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds}
+        setRemovedTaskIds={setRemovedTaskIds}
         editMode={editMode}
+        initialTasks={unassignedTasks} // Connect weekly → daily sync here
+        
       />
     </div>
   );

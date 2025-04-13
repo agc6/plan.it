@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const ToDoList = ({
@@ -14,9 +14,11 @@ const ToDoList = ({
   listId,
   onDragTaskComplete,
   removedTaskIds = new Set(),
-  editMode = false,  
+  setRemovedTaskIds = () => {}, 
+  editMode = false,
+  initialTasks = [],
+  saveNewTask = null
 }) => {
-
 
   const heightToUse = customHeight || "358px";
   const widthToUse = customWidth || "293px";
@@ -24,9 +26,17 @@ const ToDoList = ({
   const fontSizeToUse = customFontSize || "24px";
   const leftDatePaddingToUse = customLeftDatePadding || "21px";
 
-  const [taskInputs, setTaskInputs] = useState([]);
+  const [taskInputs, setTaskInputs] = useState(initialTasks || []);
+  useEffect(() => {
+    if (initialTasks?.length > 0) {
+      setTaskInputs(initialTasks);
+    }
+    // only run once
+  }, []);  
+
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const listRef = useRef(null);
+  
 
   const addNewTask = () => {
     const newTask = {
@@ -36,8 +46,13 @@ const ToDoList = ({
       color: selectedColor || "bg-blue-200", // fallback color
     };
     setTaskInputs([newTask, ...taskInputs]);
-    clearSelectedColor(); // clear selected color after task is added
-  };
+  clearSelectedColor();
+
+  // Save to context if provided
+  if (saveNewTask && typeof saveNewTask === "function") {
+    saveNewTask(newTask);
+  }
+};
 
   const handleKeyDown = (event, id) => {
     if (event.key === "Escape") {
@@ -198,9 +213,11 @@ const ToDoList = ({
                 <button
                   className="w-4  h-4 bg-red-500 text-white rounded-full flex items-center justify-center ml-auto"
                   title="Delete Task"
-                  onClick={() =>
-                    setTaskInputs((prev) => prev.filter((t) => t.id !== task.id))
-                  }
+                  onClick={() => {
+                    if (setRemovedTaskIds) {
+                      setRemovedTaskIds((prev) => new Set([...prev, `${listId}-${task.id}`]));
+                    }
+                  }}                  
                 >
                   ⛔
                 </button>
@@ -280,9 +297,11 @@ ToDoList.propTypes = {
   clearSelectedColor: PropTypes.func,
   listId: PropTypes.string,
   onDragTaskComplete: PropTypes.func,
-  removedTaskIds: PropTypes.instanceOf(Set),
-  editMode: PropTypes.bool, 
+  removedTaskIds: PropTypes.instanceOf(Set), 
+  setRemovedTaskIds: PropTypes.func,         
+  editMode: PropTypes.bool,  
+  initialTasks: PropTypes.array,    
+  saveNewTask: PropTypes.func,          
 };
-
 
 export default ToDoList;
