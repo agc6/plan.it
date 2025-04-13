@@ -13,12 +13,12 @@ import darkModeIcon0 from "../../assets/darkMode0.svg";
 import darkModeIcon1 from "../../assets/darkMode1.svg";
 import BrushCustomization from "./BrushCustomization";
 
-//import dailyIcon0 from "../../assets/DailyIcon0.svg";
-///import dailyIcon1 from "../../assets/DailyIcon1.svg";
-//import weeklyIcon0 from "../../assets/WeeklyIcon0.svg";
-//import weeklyIcon1 from "../../assets/WeeklyIcon1.svg";
-//import monthlyIcon0 from "../../assets/MonthlyIcon0.svg";
-//import monthlyIcon1 from "../../assets/MonthlyIcon1.svg";
+import dailyIcon0 from "../../assets/DailyIcon0.svg";
+import dailyIcon1 from "../../assets/DailyIcon1.svg";
+import weeklyIcon0 from "../../assets/WeeklyIcon0.svg";
+import weeklyIcon1 from "../../assets/WeeklyIcon1.svg";
+import monthlyIcon0 from "../../assets/MonthlyIcon0.svg";
+import monthlyIcon1 from "../../assets/MonthlyIcon1.svg";
 import favicon from "../../assets/favicon.svg";
 
 const getCurrentWeekOfMonth = () => {
@@ -87,11 +87,6 @@ const CalendarSite = () => {
   const [showMainColorOptions, setShowMainColorOptions] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
-
-
-  
-
-
   const currentDate = new Date();
   const formattedDate = formatDateWithSuffix(currentDate);
 
@@ -148,11 +143,29 @@ const CalendarSite = () => {
 
         <div className="flex flex-col space-y-2 mb-6">
           <div className={getButtonClasses("monthly")} onClick={() => setActiveView("monthly")}>
-            {/*<img src={isClicked ? monthlyIcon1 : isHovered ? monthlyIcon1 : monthlyIcon0} className="pr-2"/>*/}
+            <img
+              src={activeView === "monthly" ? monthlyIcon1 : monthlyIcon0}
+              className="pr-4"
+              alt="Monthly View"
+            />
             <span>Monthly</span>
           </div>
-          <div className={getButtonClasses("weekly")} onClick={() => setActiveView("weekly")}> <span>Weekly</span> </div>
-          <div className={getButtonClasses("daily")} onClick={() => setActiveView("daily")}> <span>Daily</span> </div>
+          <div className={getButtonClasses("weekly")} onClick={() => setActiveView("weekly")}>
+            <img
+              src={activeView === "weekly" ? weeklyIcon1 : weeklyIcon0}
+              className="pr-4"
+              alt="Weekly View"
+            />
+            <span>Weekly</span> 
+          </div>
+          <div className={getButtonClasses("daily")} onClick={() => setActiveView("daily")}> 
+            <img
+              src={activeView === "daily" ? dailyIcon1 : dailyIcon0}
+              className="pl-1 pr-4"
+              alt="Daily View"
+            />
+            <span>Daily</span> 
+          </div>
         </div>
 
         <div className="mb-6">
