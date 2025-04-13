@@ -26,30 +26,18 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
   };
 
   const dayKey = getDayKey();
+  const flatKey = `daily-Tasks-${dayKey}`;
 
-  // Fallback: Promote flat array-style dayKey tasks to daily-Tasks box
-  const flatDayTasks = Array.isArray(allTasks[dayKey]) ? allTasks[dayKey] : [];
-  if (flatDayTasks.length > 0) {
-    const flatKey = `daily-Tasks-${dayKey}`;
-    if (!allTasks[flatKey]) {
+  // Promote flat array tasks to ToDoList only
+  useEffect(() => {
+    const raw = allTasks[dayKey];
+    if (Array.isArray(raw) && (!allTasks[flatKey] || allTasks[flatKey].length === 0)) {
       setAllTasks(prev => ({
         ...prev,
-        [flatKey]: flatDayTasks
+        [flatKey]: raw
       }));
     }
-  }
-
-  const rawDayData = allTasks[dayKey];
-  const hourTasks = typeof rawDayData === "object" && !Array.isArray(rawDayData)
-    ? rawDayData
-    : {};
-
-  if (Array.isArray(rawDayData)) {
-    rawDayData.forEach(task => {
-      if (!hourTasks[9]) hourTasks[9] = [];
-      hourTasks[9].push({ ...task, hourAssigned: 9 });
-    });
-  }
+  }, [allTasks, dayKey, flatKey, setAllTasks]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -153,32 +141,6 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
             <div className={`text-base font-medium mb-2 ${hour === currentHour ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
               {formatHour(hour)}
             </div>
-
-            {(hourTasks[hour] || []).map(task => (
-              <div
-                key={task.id}
-                className={`flex items-center p-2 rounded ${task.color || 'bg-blue-100'}`}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData("application/json", JSON.stringify({
-                    taskId: task.id,
-                    sourceListId: `hour-${hour}`,
-                    taskData: task
-                  }));
-                }}
-              >
-                <div className="w-3 h-3 rounded-full border border-gray-400 mr-2"></div>
-                <div className={task.completed ? 'line-through text-gray-500' : ''}>
-                  {task.text || 'Untitled Task'}
-                </div>
-              </div>
-            ))}
-
-            {hoveredHour === hour && (
-              <div className="text-xs italic text-gray-500 border border-dashed border-gray-300 p-2 rounded">
-                Drop tasks here
-              </div>
-            )}
           </div>
         ))}
       </div>
