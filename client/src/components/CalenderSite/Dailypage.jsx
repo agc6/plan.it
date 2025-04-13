@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
+import { useTasks } from './TaskContext';
 
 const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [hourTasks, setHourTasks] = useState({});
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
   const scrollRef = useRef(null);
 
-  // Fallback to today if selectedDay is null or uninitialized
+  const { allTasks, setAllTasks } = useTasks();
+
   const currentDate = selectedDay?.year != null
     ? new Date(selectedDay.year, selectedDay.month, selectedDay.day)
     : new Date();
@@ -20,6 +21,36 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
     day: 'numeric',
   });
 
+  const getDayKey = () => {
+    return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+  };
+
+  const dayKey = getDayKey();
+
+  // Fallback: Promote flat array-style dayKey tasks to daily-Tasks box
+  const flatDayTasks = Array.isArray(allTasks[dayKey]) ? allTasks[dayKey] : [];
+  if (flatDayTasks.length > 0) {
+    const flatKey = `daily-Tasks-${dayKey}`;
+    if (!allTasks[flatKey]) {
+      setAllTasks(prev => ({
+        ...prev,
+        [flatKey]: flatDayTasks
+      }));
+    }
+  }
+
+  const rawDayData = allTasks[dayKey];
+  const hourTasks = typeof rawDayData === "object" && !Array.isArray(rawDayData)
+    ? rawDayData
+    : {};
+
+  if (Array.isArray(rawDayData)) {
+    rawDayData.forEach(task => {
+      if (!hourTasks[9]) hourTasks[9] = [];
+      hourTasks[9].push({ ...task, hourAssigned: 9 });
+    });
+  }
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentHour(new Date().getHours());
@@ -29,7 +60,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 8 * 65; // Scroll to 8AM
+      scrollRef.current.scrollTop = 8 * 65;
     }
   }, []);
 
@@ -55,22 +86,28 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
       const { taskId, sourceListId, taskData } = data;
 
-      setHourTasks(prev => ({
+      setAllTasks(prev => ({
         ...prev,
-        [hour]: [...(prev[hour] || []), {
-          ...taskData,
-          id: Date.now(),
-          hourAssigned: hour,
-        }]
+        [dayKey]: {
+          ...(prev[dayKey] || {}),
+          [hour]: [...(prev[dayKey]?.[hour] || []), {
+            ...taskData,
+            id: Date.now(),
+            hourAssigned: hour,
+          }]
+        }
       }));
 
       if (sourceListId.startsWith('hour-')) {
         const sourceHour = parseInt(sourceListId.split('-')[1]);
-        setHourTasks(prev => {
-          if (!prev[sourceHour]) return prev;
+        setAllTasks(prev => {
+          const updatedHours = {
+            ...(prev[dayKey] || {}),
+            [sourceHour]: (prev[dayKey]?.[sourceHour] || []).filter(t => t.id !== parseInt(taskId)),
+          };
           return {
             ...prev,
-            [sourceHour]: prev[sourceHour].filter(task => task.id !== parseInt(taskId))
+            [dayKey]: updatedHours
           };
         });
       } else {
@@ -79,20 +116,22 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
     } catch (err) {
       console.error("Error handling drop on hour:", err);
     }
-  }, []);
+  }, [setAllTasks, dayKey]);
 
   const handleTaskMove = useCallback((taskId, sourceListId) => {
-    if (sourceListId.startsWith('hour-')) {
-      const hourNum = parseInt(sourceListId.split('-')[1]);
-      setHourTasks(prev => {
-        if (!prev[hourNum]) return prev;
-        return {
-          ...prev,
-          [hourNum]: prev[hourNum].filter(task => task.id !== taskId)
-        };
-      });
-    }
-  }, []);
+    const hour = parseInt(sourceListId.split('-')[1]);
+
+    setAllTasks(prev => {
+      const updatedHours = {
+        ...(prev[dayKey] || {}),
+        [hour]: (prev[dayKey]?.[hour] || []).filter(t => t.id !== taskId),
+      };
+      return {
+        ...prev,
+        [dayKey]: updatedHours
+      };
+    });
+  }, [setAllTasks, dayKey]);
 
   return (
     <div className="flex px-6 py-4">
@@ -115,29 +154,25 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
               {formatHour(hour)}
             </div>
 
-            {hourTasks[hour] && hourTasks[hour].length > 0 && (
-              <div className="space-y-2 mb-2">
-                {hourTasks[hour].map(task => (
-                  <div
-                    key={task.id}
-                    className={`flex items-center p-2 rounded ${task.color || 'bg-blue-100'}`}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("application/json", JSON.stringify({
-                        taskId: task.id,
-                        sourceListId: `hour-${hour}`,
-                        taskData: task
-                      }));
-                    }}
-                  >
-                    <div className="w-3 h-3 rounded-full border border-gray-400 mr-2"></div>
-                    <div className={task.completed ? 'line-through text-gray-500' : ''}>
-                      {task.text || 'Untitled Task'}
-                    </div>
-                  </div>
-                ))}
+            {(hourTasks[hour] || []).map(task => (
+              <div
+                key={task.id}
+                className={`flex items-center p-2 rounded ${task.color || 'bg-blue-100'}`}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("application/json", JSON.stringify({
+                    taskId: task.id,
+                    sourceListId: `hour-${hour}`,
+                    taskData: task
+                  }));
+                }}
+              >
+                <div className="w-3 h-3 rounded-full border border-gray-400 mr-2"></div>
+                <div className={task.completed ? 'line-through text-gray-500' : ''}>
+                  {task.text || 'Untitled Task'}
+                </div>
               </div>
-            )}
+            ))}
 
             {hoveredHour === hour && (
               <div className="text-xs italic text-gray-500 border border-dashed border-gray-300 p-2 rounded">
@@ -149,13 +184,13 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
       </div>
 
       <ToDoList
-        weekText="TASKS"
+        weekText="Tasks"
         customHeight="785px"
         customTitleWidth="205px"
         customFontSize="20px"
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
-        listId="daily-tasks"
+        listId={`daily-Tasks-${dayKey}`}
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds}
         editMode={editMode}
