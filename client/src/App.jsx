@@ -7,9 +7,11 @@ import GetStarted from "./pages/GetStarted";
 import LogIn from "./pages/LogIn";
 import Calender from "./components/CalenderSite/Calender";
 import Dailypage from "./components/CalenderSite/Dailypage";
+import { TaskProvider } from "./components/CalenderSite/TaskContext";
 
 function App() {
   return (
+  <TaskProvider>
     <Routes>
       <Route
         path="/"
@@ -27,6 +29,7 @@ function App() {
       <Route path="/calendar" element={<Calender />} />
       <Route path="/day/:year/:month/:day" element={<Dailypage />} />
     </Routes>
+  </TaskProvider>
   );
 }
 

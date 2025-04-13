@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
+import { useTasks } from "./TaskContext";
 
 const generateWeeksForCurrentMonth = () => {
   const today = new Date();
@@ -56,18 +57,12 @@ const generateWeeksForCurrentMonth = () => {
 
 const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek, editMode }) => {
   const weeks = generateWeeksForCurrentMonth();
-  const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
+  const { isCurrentWeekTask } = useTasks();
 
   const handleWeekClick = (weekNumber) => {
     setSelectedWeek(weekNumber);
     setActiveView("weekly");
   };
-
-  // Handle task movements between lists
-  const handleTaskMove = useCallback((taskId, sourceListId) => {
-    // Mark this task as moved so the source list knows to remove it
-    setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
-  }, []);
 
   return (
     <div className="flex flex-row">
@@ -88,14 +83,12 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
     selectedColor={selectedColor}
     clearSelectedColor={clearSelectedColor}
     listId={`week-${week.weekNumber}`}
-    onDragTaskComplete={handleTaskMove}
-    removedTaskIds={removedTaskIds}
     editMode={editMode}
   />
 ))}
-        </div>
-        <div className="flex flex-row">
-        {weeks.slice(3, 5).map((week) => (
+</div>
+<div className="flex flex-row">
+{weeks.slice(3, 5).map((week) => (
   <ToDoList
     key={week.weekText}
     weekText={
@@ -113,11 +106,9 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
     selectedColor={selectedColor}
     clearSelectedColor={clearSelectedColor}
     listId={`week-${week.weekNumber}`}
-    onDragTaskComplete={handleTaskMove}
-    removedTaskIds={removedTaskIds}
+        editMode={editMode}
   />
 ))}
-
         </div>
       </div>
       <ToDoList
@@ -128,8 +119,6 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
         listId="future-months"
-        onDragTaskComplete={handleTaskMove}
-        removedTaskIds={removedTaskIds} 
         editMode={editMode}
       />
     </div>
@@ -141,6 +130,7 @@ MonthlyPage.propTypes = {
   clearSelectedColor: PropTypes.func,
   setActiveView: PropTypes.func,
   setSelectedWeek: PropTypes.func,
+  editMode: PropTypes.bool,
 };
 
 export default MonthlyPage;

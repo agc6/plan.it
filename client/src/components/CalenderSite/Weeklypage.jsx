@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
+import { useTasks } from "./TaskContext";
 
 const Weeklypage = ({
   selectedColor,
@@ -10,7 +11,7 @@ const Weeklypage = ({
   setSelectedDay,
   setActiveView
 }) => {
-  const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
+  const { allTasks } = useTasks();
 
   const today = new Date();
   const year = today.getFullYear();
@@ -51,18 +52,19 @@ const Weeklypage = ({
     });
   }
 
-  const handleTaskMove = useCallback((taskId, sourceListId) => {
-    setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
-  }, []);
-
   return (
     <div className="flex flex-col">
       <div className="flex flex-row flex-wrap">
         <ToDoList
-          customHeight={310}
-          customWidth={295}
-          weekText={"Weekly Tasks"}
-          customTitleWidth={190}
+          weekText="Weekly Tasks"
+          customHeight="310px"
+          customWidth="295px"
+          customTitleWidth="190px"
+          selectedColor={selectedColor}
+          clearSelectedColor={clearSelectedColor}
+          listId="weekly-tasks"
+          isWeeklyTasks={true}
+          editMode={editMode}
         />
         {days.map((day, idx) => (
           <div key={idx}>
@@ -86,8 +88,6 @@ const Weeklypage = ({
               customTitleWidth={day.customTitleWidth}
               clearSelectedColor={clearSelectedColor}
               listId={`day-${day.day}`}
-              onDragTaskComplete={handleTaskMove}
-              removedTaskIds={removedTaskIds}
               editMode={editMode}
             />
           </div>
