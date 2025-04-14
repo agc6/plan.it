@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { useTasks } from "./TaskContext";
+import deleteIcon from "../../assets/icons8-delete.svg"
 
 const ToDoList = ({
   weekText,
@@ -193,9 +194,11 @@ const ToDoList = ({
             onDragStart={(e) => handleDragStart(e, task.id, task)}
           >
             <button
-              className="w-5 h-5 rounded-full ml-3 border-[0.5px] border-[#8B97A5] bg-white cursor-pointer flex items-center justify-center"
+              className="w-6 h-5 rounded-full ml-3 border-[0.5px] border-[#8B97A5] bg-white cursor-pointer flex items-center justify-center box-border"
               title="Apply selected color"
-              onClick={() => handleCircleClick(task.id)}>
+              onClick={() => handleCircleClick(task.id)}
+              style={{ borderRadius: '50%' }}
+              >
                 {task.completed && (<div className="w-3 h-3 rounded-full bg-[#313131] absolute" />)}
             </button>
             <input
@@ -221,14 +224,15 @@ const ToDoList = ({
                 }
               }}
             />
-            {editMode && (
+            {editMode ? (
               <button
-                className="w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center ml-auto"
+                className="w-7 h-7 text-white rounded-full flex items-center justify-center mr-3"
                 title="Delete Task"
                 onClick={() => handleDeleteTask(task.id)}
               >
-                ⛔
+                <img src={deleteIcon} alt="Delete" />
               </button>
+              ) : (<div className="w-7 h-7 mr-3 invisible" />
             )}
           </div>
         ))}
