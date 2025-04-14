@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ToDoList from './ToDoList';
+import { useTasks } from './TaskContext';
 
 const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay }) => {
   const [hoveredHour, setHoveredHour] = useState(null);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [hourTasks, setHourTasks] = useState({});
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
   const scrollRef = useRef(null);
 
-  // Fallback to today if selectedDay is null or uninitialized
+  const { allTasks, setAllTasks, moveTask } = useTasks();
+
   const currentDate = selectedDay?.year != null
     ? new Date(selectedDay.year, selectedDay.month, selectedDay.day)
     : new Date();
@@ -20,6 +21,24 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
     day: 'numeric',
   });
 
+  const getDayKey = () => {
+    return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+  };
+
+  const dayKey = getDayKey();
+  const flatKey = `daily-Tasks-${dayKey}`;
+
+  // Promote flat array tasks to ToDoList only
+  useEffect(() => {
+    const raw = allTasks[dayKey];
+    if (Array.isArray(raw) && (!allTasks[flatKey] || allTasks[flatKey].length === 0)) {
+      setAllTasks(prev => ({
+        ...prev,
+        [flatKey]: raw
+      }));
+    }
+  }, [allTasks, dayKey, flatKey, setAllTasks]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentHour(new Date().getHours());
@@ -29,7 +48,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = 8 * 65; // Scroll to 8AM
+      scrollRef.current.scrollTop = 8 * 65;
     }
   }, []);
 
@@ -55,44 +74,170 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
       const data = JSON.parse(e.dataTransfer.getData("application/json"));
       const { taskId, sourceListId, taskData } = data;
 
-      setHourTasks(prev => ({
+    // If dropping from daily task list to hour
+    if (sourceListId === flatKey) {
+      // Add task to the hour
+      setAllTasks(prev => ({
         ...prev,
-        [hour]: [...(prev[hour] || []), {
-          ...taskData,
-          id: Date.now(),
-          hourAssigned: hour,
-        }]
+        [dayKey]: {
+          ...(prev[dayKey] || {}),
+          [hour]: [...(prev[dayKey]?.[hour] || []), {
+            ...taskData,
+            id: Date.now(),
+            hourAssigned: hour,
+          }]
+        }
       }));
 
-      if (sourceListId.startsWith('hour-')) {
+        // Remove from the task list
+        setAllTasks(prev => ({
+          ...prev,
+          [flatKey]: (prev[flatKey] || []).filter(t => t.id !== parseInt(taskId))
+        }));
+      }
+      // If dropping from one hour to another
+      else if (sourceListId.startsWith('hour-')) {
         const sourceHour = parseInt(sourceListId.split('-')[1]);
-        setHourTasks(prev => {
-          if (!prev[sourceHour]) return prev;
+        
+        // Don't do anything if dropping to the same hour
+        if (sourceHour === hour) return;
+        
+        // Add to target hour
+        setAllTasks(prev => ({
+          ...prev,
+          [dayKey]: {
+            ...(prev[dayKey] || {}),
+            [hour]: [...(prev[dayKey]?.[hour] || []), {
+              ...taskData,
+              id: Date.now(),
+              hourAssigned: hour,
+            }]
+          }
+        }));
+        
+        // Remove from source hour
+        setAllTasks(prev => {
+          const updatedHours = {
+            ...(prev[dayKey] || {}),
+            [sourceHour]: (prev[dayKey]?.[sourceHour] || []).filter(t => t.id !== parseInt(taskId)),
+          };
           return {
             ...prev,
-            [sourceHour]: prev[sourceHour].filter(task => task.id !== parseInt(taskId))
+            [dayKey]: updatedHours
           };
         });
-      } else {
+      }
+      // If dropping from another list (like weekly, monthly, etc.)
+      else {
+        // Add to hour
+        setAllTasks(prev => ({
+          ...prev,
+          [dayKey]: {
+            ...(prev[dayKey] || {}),
+            [hour]: [...(prev[dayKey]?.[hour] || []), {
+              ...taskData,
+              id: Date.now(),
+              hourAssigned: hour,
+            }]
+          }
+        }));
+        
+        // Mark as removed from source
         setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
+        
+        // Use moveTask to handle the removal from source list
+        moveTask(parseInt(taskId), sourceListId, `hour-${hour}`, taskData);
       }
     } catch (err) {
       console.error("Error handling drop on hour:", err);
     }
-  }, []);
+  }, [setAllTasks, dayKey, flatKey, moveTask]);
 
   const handleTaskMove = useCallback((taskId, sourceListId) => {
-    if (sourceListId.startsWith('hour-')) {
-      const hourNum = parseInt(sourceListId.split('-')[1]);
-      setHourTasks(prev => {
-        if (!prev[hourNum]) return prev;
-        return {
-          ...prev,
-          [hourNum]: prev[hourNum].filter(task => task.id !== taskId)
-        };
-      });
-    }
-  }, []);
+  if (sourceListId.startsWith('hour-')) {
+    const hour = parseInt(sourceListId.split('-')[1]);
+
+    setAllTasks(prev => {
+      const updatedHours = {
+        ...(prev[dayKey] || {}),
+        [hour]: (prev[dayKey]?.[hour] || []).filter(t => t.id !== taskId),
+      };
+      return {
+        ...prev,
+        [dayKey]: updatedHours
+      };
+    });
+  }
+  }, [setAllTasks, dayKey]);
+
+  // Render tasks in each hour slot
+  const renderTasksForHour = (hour) => {
+    const hourTasks = allTasks[dayKey]?.[hour] || [];
+    if (hourTasks.length === 0) return null;
+
+    return (
+      <div className="mt-2">
+        {hourTasks.map(task => (
+          <div 
+            key={task.id} 
+            className={`flex items-center space-x-2 mb-1 p-1 rounded ${task.color || 'bg-blue-100'}`}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("application/json", JSON.stringify({
+                taskId: task.id,
+                sourceListId: `hour-${hour}`,
+                taskData: task
+              }));
+              e.dataTransfer.effectAllowed = "move";
+            }}
+          >
+            <div className="w-3 h-3 rounded-full border border-gray-500" 
+                onClick={() => {
+                  // Toggle completion status
+                  setAllTasks(prev => {
+                    const updatedTasks = prev[dayKey][hour].map(t => 
+                      t.id === task.id ? {...t, completed: !t.completed} : t
+                    );
+                    
+                    return {
+                      ...prev,
+                      [dayKey]: {
+                        ...prev[dayKey],
+                        [hour]: updatedTasks
+                      }
+                    };
+                  });
+                }}
+            />
+            <div className={`text-sm flex-grow ${task.completed ? 'line-through text-gray-500' : ''}`}>
+              {task.text}
+            </div>
+            {editMode && (
+              <button 
+                className="text-xs text-red-500"
+                onClick={() => {
+                  // Delete task
+                  setAllTasks(prev => {
+                    const filteredTasks = prev[dayKey][hour].filter(t => t.id !== task.id);
+                    
+                    return {
+                      ...prev,
+                      [dayKey]: {
+                        ...prev[dayKey],
+                        [hour]: filteredTasks
+                      }
+                    };
+                  });
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="flex px-5 py-3">
@@ -114,36 +259,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
             <div className={`text-base font-medium mb-2 ${hour === currentHour ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
               {formatHour(hour)}
             </div>
-
-            {hourTasks[hour] && hourTasks[hour].length > 0 && (
-              <div className="space-y-2 mb-2">
-                {hourTasks[hour].map(task => (
-                  <div
-                    key={task.id}
-                    className={`flex items-center p-2 rounded ${task.color || 'bg-blue-100'}`}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("application/json", JSON.stringify({
-                        taskId: task.id,
-                        sourceListId: `hour-${hour}`,
-                        taskData: task
-                      }));
-                    }}
-                  >
-                    <div className="w-3 h-3 rounded-full border border-gray-400 mr-2"></div>
-                    <div className={task.completed ? 'line-through text-gray-500' : ''}>
-                      {task.text || 'Untitled Task'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {hoveredHour === hour && (
-              <div className="text-xs italic text-gray-500 border border-dashed border-gray-300 p-2 rounded">
-                Drop tasks here
-              </div>
-            )}
+            {renderTasksForHour(hour)}
           </div>
         ))}
       </div>
@@ -155,7 +271,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
         customFontSize="23px"
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
-        listId="daily-tasks"
+        listId={`daily-Tasks-${dayKey}`}
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds}
         editMode={editMode}

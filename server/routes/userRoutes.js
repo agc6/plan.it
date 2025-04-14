@@ -1,7 +1,6 @@
 const express = require("express");
 const User = require("../models/User");
-const auth = require("../middleware/auth"); // You'll need to create this middleware
-
+const auth = require("../middleware/auth");
 const router = express.Router();
 
 // Update user preferences

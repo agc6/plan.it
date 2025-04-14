@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import ToDoList from "./ToDoList";
+import { useTasks } from "./TaskContext";
 
 const generateWeeksForCurrentMonth = () => {
   const today = new Date();
@@ -8,7 +9,7 @@ const generateWeeksForCurrentMonth = () => {
   const month = today.getMonth();
 
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0); // Last day of current month
+  const lastDay = new Date(year, month + 1, 0);
 
   const weeks = [];
   let start = new Date(firstDay);
@@ -17,7 +18,6 @@ const generateWeeksForCurrentMonth = () => {
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
 
-    // Clamp end to the last day of the month
     if (end > lastDay) {
       end.setTime(lastDay.getTime());
     }
@@ -29,11 +29,12 @@ const generateWeeksForCurrentMonth = () => {
       weekText: `WEEK ${weeks.length + 1}`,
       dateRange: `${format(start)} ─ ${format(end)}`,
       weekNumber: weeks.length + 1,
+      listId: `week-${weeks.length + 1}`
     });
 
-    // Move to next week
     start.setDate(start.getDate() + 7);
   }
+
   if (weeks[3]) {
     weeks[3] = {
       ...weeks[3],
@@ -54,72 +55,88 @@ const generateWeeksForCurrentMonth = () => {
   return weeks;
 };
 
-const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSelectedWeek, editMode }) => {
+const MonthlyPage = ({
+  selectedColor,
+  clearSelectedColor,
+  setActiveView,
+  setSelectedWeek,
+  editMode,
+}) => {
   const weeks = generateWeeksForCurrentMonth();
   const [removedTaskIds, setRemovedTaskIds] = useState(new Set());
+  const { allTasks, moveTask } = useTasks();
 
   const handleWeekClick = (weekNumber) => {
     setSelectedWeek(weekNumber);
     setActiveView("weekly");
   };
 
-  // Handle task movements between lists
-  const handleTaskMove = useCallback((taskId, sourceListId) => {
-    // Mark this task as moved so the source list knows to remove it
-    setRemovedTaskIds(prev => new Set([...prev, `${sourceListId}-${taskId}`]));
-  }, []);
+  const handleTaskMove = useCallback(
+    (taskId, sourceListId, targetListId, taskData) => {
+      moveTask(taskId, sourceListId, targetListId, taskData);
+      setRemovedTaskIds((prev) => new Set([...prev, `${sourceListId}-${taskId}`]));
+    },
+    [moveTask]
+  );
+
+  const getTasksForList = (listId) => {
+    return allTasks[listId] || [];
+  };
 
   return (
     <div className="flex flex-row">
       <div className="flex flex-col">
         <div className="flex flex-row">
-        {weeks.slice(0, 3).map((week) => (
-  <ToDoList
-    key={week.weekText}
-    weekText={
-      <span
-        onClick={() => handleWeekClick(week.weekNumber)}
-        className="cursor-pointer hover:underline"
-      >
-        {week.weekText}
-      </span>
-    }
-    dateRange={week.dateRange}
-    selectedColor={selectedColor}
-    clearSelectedColor={clearSelectedColor}
-    listId={`week-${week.weekNumber}`}
-    onDragTaskComplete={handleTaskMove}
-    removedTaskIds={removedTaskIds}
-    editMode={editMode}
-  />
-))}
+          {weeks.slice(0, 3).map((week) => (
+            <ToDoList
+              key={week.weekText}
+              weekText={
+                <span
+                  onClick={() => handleWeekClick(week.weekNumber)}
+                  className="cursor-pointer hover:underline"
+                >
+                  {week.weekText}
+                </span>
+              }
+              dateRange={week.dateRange}
+              selectedColor={selectedColor}
+              clearSelectedColor={clearSelectedColor}
+              listId={week.listId}
+              onDragTaskComplete={handleTaskMove}
+              removedTaskIds={removedTaskIds}
+              editMode={editMode}
+              initialTasks={getTasksForList(week.listId)}
+            />
+          ))}
         </div>
         <div className="flex flex-row">
-        {weeks.slice(3, 5).map((week) => (
-  <ToDoList
-    key={week.weekText}
-    weekText={
-      <span
-        onClick={() => handleWeekClick(week.weekNumber)}
-        className="cursor-pointer hover:underline"
-      >
-        {week.weekText}
-      </span>
-    }
-    dateRange={week.dateRange}
-    customHeight={week.customHeight}
-    customWidth={week.customWidth}
-    customLeftDatePadding={week.customLeftDatePadding}
-    selectedColor={selectedColor}
-    clearSelectedColor={clearSelectedColor}
-    listId={`week-${week.weekNumber}`}
-    onDragTaskComplete={handleTaskMove}
-    removedTaskIds={removedTaskIds}
-  />
-))}
-
+          {weeks.slice(3, 5).map((week) => (
+            <ToDoList
+              key={week.weekText}
+              weekText={
+                <span
+                  onClick={() => handleWeekClick(week.weekNumber)}
+                  className="cursor-pointer hover:underline"
+                >
+                  {week.weekText}
+                </span>
+              }
+              dateRange={week.dateRange}
+              customHeight={week.customHeight}
+              customWidth={week.customWidth}
+              customLeftDatePadding={week.customLeftDatePadding}
+              selectedColor={selectedColor}
+              clearSelectedColor={clearSelectedColor}
+              listId={week.listId}
+              onDragTaskComplete={handleTaskMove}
+              removedTaskIds={removedTaskIds}
+              editMode={editMode}
+              initialTasks={getTasksForList(week.listId)}
+            />
+          ))}
         </div>
       </div>
+
       <ToDoList
         weekText="FUTURE MONTHS"
         customHeight="643px"
@@ -129,8 +146,9 @@ const MonthlyPage = ({ selectedColor, clearSelectedColor, setActiveView, setSele
         clearSelectedColor={clearSelectedColor}
         listId="future-months"
         onDragTaskComplete={handleTaskMove}
-        removedTaskIds={removedTaskIds} 
+        removedTaskIds={removedTaskIds}
         editMode={editMode}
+        initialTasks={getTasksForList("future-months")}
       />
     </div>
   );
@@ -141,6 +159,7 @@ MonthlyPage.propTypes = {
   clearSelectedColor: PropTypes.func,
   setActiveView: PropTypes.func,
   setSelectedWeek: PropTypes.func,
+  editMode: PropTypes.bool,
 };
 
 export default MonthlyPage;
