@@ -15,6 +15,7 @@ const ToDoList = ({
   onDragTaskComplete,
   removedTaskIds = new Set(),
   editMode = false,  
+  customMargin,
 }) => {
 
 
@@ -23,6 +24,7 @@ const ToDoList = ({
   const titleWidthToUse = customTitleWidth || "125px";
   const fontSizeToUse = customFontSize || "24px";
   const leftDatePaddingToUse = customLeftDatePadding || "21px";
+  const marginToUSe = customMargin || "12px";
 
   const [taskInputs, setTaskInputs] = useState([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -127,9 +129,9 @@ const ToDoList = ({
   return (
     <div
       ref={listRef}
-      className={`relative group m-3 mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 
+      className={`relative group mb-2 bg-white outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] shadow-sm shadow-gray-400 
         ${isDraggingOver ? "bg-blue-50" : ""}`}
-      style={{ height: heightToUse, width: widthToUse }}
+      style={{ height: heightToUse, width: widthToUse, margin: marginToUSe }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -160,28 +162,30 @@ const ToDoList = ({
         className="mt-2 overflow-y-auto custom-scrollbar"
         style={{
           maxHeight: `calc(${heightToUse} - 75px)`,
-          paddingRight: "20px",
+          paddingRight: "10px",
+          paddingLeft: "10px",
         }}
       >
         {filteredTasks.map((task) => (
           <div
             key={task.id}
-            className={`flex items-center space-x-3 mb-2 w-full ${task.color}`}
+            className={`flex border-[0.5px] border-[#8B97A5] rounded-full items-center mb-2 w-full ${task.color}`}
             draggable
             onDragStart={(e) => handleDragStart(e, task.id, task)}
           >
             <button
-              className="w-4 h-4 rounded-full border-2 border-black bg-white cursor-pointer"
+              className="w-5 h-5 rounded-full ml-3 border-[0.5px] border-[#8B97A5] bg-white cursor-pointer flex items-center justify-center"
               title="Apply selected color"
-              onClick={() => handleCircleClick(task.id)}
-            />
+              onClick={() => handleCircleClick(task.id)}>
+                {task.completed && (<div className="w-3 h-3 rounded-full bg-[#313131] absolute" />)}
+            </button>
             <input
               type="text"
               placeholder="Enter a task..."
               value={task.text}
               onChange={(e) => handleChange(e, task.id)}
               onKeyDown={(e) => handleKeyDown(e, task.id)}
-              className={`p-2 border border-gray-300 rounded w-full transition-all duration-300 ease-in-out transform 
+              className={`p-2 rounded-full w-full transition-all focus:outline-none duration-300 ease-in-out transform 
               ${task.animate ? "animate-slide-down" : ""} 
               ${task.completed ? "line-through text-gray-500 opacity-60" : ""} 
               cursor-grab`} // Add grab cursor for draggable items

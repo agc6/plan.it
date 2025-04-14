@@ -95,9 +95,9 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
   }, []);
 
   return (
-    <div className="flex px-6 py-4">
-      <div ref={scrollRef} className="w-[80%] max-h-[800px] overflow-y-scroll border rounded-md bg-white shadow-sm mr-6">
-        <div className="sticky top-0 z-10 bg-white p-4 border-b text-lg font-bold">
+    <div className="flex px-5 py-3">
+      <div ref={scrollRef} className="w-[80%] max-h-[645px] overflow-y-scroll outline-[0.5px] outline-[#484848] rounded-t-[25px] rounded-b-[10px] bg-white shadow-sm mr-6">
+        <div className="sticky top-0 z-10 bg-white p-4 outline-[0.5px] outline-[#484848] text-xl font-semibold">
           {formattedDate}
         </div>
 
@@ -149,16 +149,17 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
       </div>
 
       <ToDoList
-        weekText="TASKS"
-        customHeight="785px"
-        customTitleWidth="205px"
-        customFontSize="20px"
+        weekText="Daily Tasks"
+        customHeight="645px"
+        customTitleWidth="185px"
+        customFontSize="23px"
         selectedColor={selectedColor}
         clearSelectedColor={clearSelectedColor}
         listId="daily-tasks"
         onDragTaskComplete={handleTaskMove}
         removedTaskIds={removedTaskIds}
         editMode={editMode}
+        customMargin="0px"
       />
     </div>
   );

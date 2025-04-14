@@ -21,6 +21,11 @@ import monthlyIcon0 from "../../assets/MonthlyIcon0.svg";
 import monthlyIcon1 from "../../assets/MonthlyIcon1.svg";
 import favicon from "../../assets/favicon.svg";
 
+import SettingsIcon from "../../assets/SettingIcon.svg"
+import NotificationsIcon from "../../assets/NotifIcon.svg"
+
+import calDropDown from "../../assets/CalDropDownIcon.svg"
+
 const getCurrentWeekOfMonth = () => {
   const today = new Date();
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -141,7 +146,7 @@ const CalendarSite = () => {
             </div>
         </div>
 
-        <div className="flex flex-col space-y-2 mb-6">
+        <div className="flex flex-col space-y-1 mb-10">
           <div className={getButtonClasses("monthly")} onClick={() => setActiveView("monthly")}>
             <img
               src={activeView === "monthly" ? monthlyIcon1 : monthlyIcon0}
@@ -169,9 +174,11 @@ const CalendarSite = () => {
         </div>
 
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => setShowCalendars(!showCalendars)}>
-            <h3 className="text-xs font-bold text-[#222222]">Calendars</h3>
-            <span className={`text-xs text-[#222222] transform transition-transform ${showCalendars ? "" : "rotate-180"}`}> ▾ </span>
+          <div className="flex items-center justify-between mb-3 cursor-pointer" onClick={() => setShowCalendars(!showCalendars)}>
+            <h3 className="text-md font-archivo font-semibold text-[#484848]">Calendars</h3>
+            <span className={`transform transition-transform ${showCalendars ? "" : "rotate-180"}`}>
+              <img src={calDropDown} alt="Dropdown Arrow" className="w-3 h-3 text-[#222222]" />
+            </span>
           </div>
           {showCalendars && (
             <ul className="space-y-2">
@@ -203,18 +210,22 @@ const CalendarSite = () => {
           )}
         </div>
 
-        <div className="mt-auto border-t border-gray-300 pt-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="text-sm text-[#222222]">🔔</span>
-            <span className="text-xs text-gray-700">Notifications</span>
+        <div className="mt-auto">
+          <div className="flex items-center space-x-2 mb-2 ml-0.5">
+            <span className="text-sm text-[#222222]">
+              <img src={NotificationsIcon} alt="Notifications" className="w-6 h-6 align-middle" />
+            </span>
+            <span className="text-sm text-gray-700">Notifications</span>
           </div>
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="text-sm text-[#222222]">⚙️</span>
-            <span className="text-xs text-gray-700">Settings</span>
+          <div className="flex items-center space-x-2 mb-3 ml-0.5">
+            <span className="text-sm text-[#222222]">
+              <img src={SettingsIcon} alt="Settings" className="w-6 h-6 align-middle" />
+            </span>
+            <span className="text-sm text-gray-700">Settings</span>
           </div>
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setShowUserSettings(true)}>
+          <div className="flex items-center space-x-2 cursor-pointer border-t border-gray-300 mt-auto pt-2" onClick={() => setShowUserSettings(true)}>
             <img src={userIcon} alt="User" className="w-8 h-8 rounded-full border-2 border-gray-300" />
-            <span className="text-xs text-gray-700">{userName || "User"}</span>
+            <span className="text-sm text-gray-700">{userName || "Jane Doe"}</span>
           </div>
         </div>
       </div>
