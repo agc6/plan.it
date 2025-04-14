@@ -31,10 +31,6 @@ const ToDoList = ({
   const leftDatePaddingToUse = customLeftDatePadding || "21px";
   const marginToUSe = customMargin || "12px";
 
-  const [taskInputs, setTaskInputs] = useState([]);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const listRef = useRef(null);
-
   const addNewTask = () => {
     const newTask = {
       id: Date.now(),
