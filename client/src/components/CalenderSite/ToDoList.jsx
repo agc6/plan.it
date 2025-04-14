@@ -185,7 +185,7 @@ const ToDoList = ({
           paddingLeft: "10px",
         }}
       >
-        {filteredTasks.map((task) => (
+        {taskInputs.map((task) => (
           <div
             key={task.id}
             className={`flex border-[0.5px] border-[#8B97A5] rounded-full items-center mb-2 w-full ${task.color}`}
