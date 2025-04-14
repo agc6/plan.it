@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import TempCalendarButton from "./TempCalendarButton"; // adjust the path if needed
 import favicon from "../assets/favicon.svg";
 
 const Navbar = () => {
@@ -105,7 +104,6 @@ const Navbar = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <TempCalendarButton />
           </motion.div>
         </div>
 
