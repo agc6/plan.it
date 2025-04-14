@@ -173,7 +173,7 @@ const Dailypage = ({ selectedColor, clearSelectedColor, editMode, selectedDay })
   // Render tasks in each hour slot
   const renderTasksForHour = (hour) => {
     const hourTasks = allTasks[dayKey]?.[hour] || [];
-    if (hourTasks.length === 0) return null;
+    if (!Array.isArray(hourTasks)) return null;
 
     return (
       <div className="mt-2">

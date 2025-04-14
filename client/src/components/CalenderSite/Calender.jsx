@@ -239,7 +239,7 @@ const CalendarSite = () => {
             <CustomButton customIcon={customizeIcon0}selectedIcon={customizeIcon1}onClick={() => setShowCustomizeBox((prev) => !prev)}/>
             <CustomButton customIcon={editIcon0}selectedIcon={editIcon1}marginRight="20px"onClick={() => setEditMode(prev => !prev)}/>
             {editMode && (
-  <div className="absolute top-20 right-6 bg-yellow-200 text-black px-3 py-1 rounded-md shadow-md text-sm">
+  <div className="absolute z-10 top-20 right-6 bg-yellow-200 text-black px-3 py-1 rounded-md shadow-md text-sm">
     ✏️ Edit Mode Enabled
   </div>
 )}
