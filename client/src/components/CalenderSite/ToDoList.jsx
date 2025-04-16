@@ -237,8 +237,14 @@ const ToDoList = ({
           </div>
         ))}
       </div>
-      {isDraggingOver && <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-t-[25px] rounded-b-[10px] pointer-events-none"></div>}
-      <button onClick={addNewTask} className="absolute bottom-3 right-3 bg-blue-500 text-white w-10 h-10 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md" title="Add Task">+</button>
+      {isDraggingOver && <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-t-[25px]
+                                         rounded-b-[10px] pointer-events-none"></div>}
+
+      <button onClick={addNewTask} className="absolute text-4xl bottom-3 right-3 font-archivo font-extralight bg-[#4058F5] text-white 
+                                              w-10 h-10 flex items-center justify-center rounded-tl-full rounded-bl-full rounded-tr-full 
+                                              opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md hover:scale-105
+                                              pb-1 hover:bg-[#4640f5] active:scale-85 active:shadow-inner" 
+      title="Add Task">+</button>
     </div>
   );
 };

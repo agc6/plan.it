@@ -19,7 +19,7 @@ const Weeklypage = ({
 
   const days = [];
 
-  const startDay = (selectedWeek - 1) * 7 + 1;
+  const startDay = (selectedWeek - 1) * 7;
   const endDay = startDay + 6;
   const lastDay = new Date(year, month + 1, 0).getDate(); // last day of the month
 

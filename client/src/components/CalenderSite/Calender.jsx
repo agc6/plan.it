@@ -72,7 +72,7 @@ const CalendarSite = () => {
   const [showCalendars, setShowCalendars] = useState(true);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [userName, setUserName] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedColor, setSelectedColor] = useState(null);
   const [selectedWeek, setSelectedWeek] = useState(getCurrentWeekOfMonth());
   const [selectedDay, setSelectedDay] = useState({ year: null, month: null, day: null });
 
@@ -120,15 +120,17 @@ const CalendarSite = () => {
         bg-[#F0F5FA]
         border border-[#8B97A5]
         border-[0.5px]
+        font-semibold
+        shadow-sm
       `;
     } else {
-      classes += " bg-transparent";
+      classes += "bg-transparent hover:scale-105 transition-transform hover:bg-500";
     }
     return classes;
   };
 
   const handleColorClick = (color) => {
-    setSelectedColor(color);
+    setSelectedColor((prevColor) => (prevColor === color ? null : color));
   };
 
   const clearSelectedColor = () => {
@@ -183,14 +185,16 @@ const CalendarSite = () => {
           {showCalendars && (
             <ul className="space-y-2">
               {[
-                { name: "NUEVA", color: "bg-pink-400" },
-                { name: "Calculus", color: "bg-green-400" },
-                { name: "Org. Bio. Lab", color: "bg-blue-400" },
-                { name: "Human Factors", color: "bg-yellow-400" },
-                { name: "Misc.", color: "bg-purple-400" },
+                { name: "Work", color: "bg-pink-400" },
+                { name: "School", color: "bg-green-400" },
+                { name: "Social", color: "bg-blue-400" },
+                { name: "Chores", color: "bg-yellow-400" },
+                { name: "Extracurriculars", color: "bg-purple-400" },
               ].map(({ name, color }) => (
                 <li key={name} className="flex items-center space-x-2 cursor-pointer" onClick={() => handleColorClick(color)}>
-                  <span className={`w-4 h-4 rounded-[5px] ${color}`}></span>
+                  <span className={`w-4 h-4 hover:scale-110 transition-transform rounded-[5px] ${color} ${
+                    selectedColor === color ? 'outline-2 outline-gray' : ''}`}>
+                  </span>
                   <span className="text-sm text-[#222222]">{name}</span>
                 </li>
               ))}
@@ -202,9 +206,12 @@ const CalendarSite = () => {
                 </li>
               ))}
 
-              <li className="flex items-center space-x-2 cursor-pointer" onClick={() => setShowNewCalendarModal(true)}>
-                <span className="w-4 h-4 rounded-[5px] bg-gray-400"></span>
-                <span className="text-sm text-[#222222] underline">New calendar...</span>
+              <li className="relative flex items-center space-x-2 cursor-pointer group" onClick={() => setShowNewCalendarModal(true)}>
+                <span className="w-4 h-4 rounded-[5px] outline-1 outline-gray-400 bg-gray-50"></span>
+                <span className="text-sm text-[#636363]">New calendar...</span>
+                <div className="absolute inset-0 flex pl-0.5 pb-0.5 items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-500 text-lg font-archivo font-extralight">
+                  +
+                </div>
               </li>
             </ul>
           )}
@@ -275,7 +282,7 @@ const CalendarSite = () => {
             <MonthlyPage
               editMode={editMode}
               selectedColor={selectedColor}
-              clearSelectedColor={clearSelectedColor}
+              
               setSelectedWeek={setSelectedWeek}
               setActiveView={setActiveView}
             />
@@ -284,7 +291,7 @@ const CalendarSite = () => {
             <WeeklyPage
               editMode={editMode}
               selectedColor={selectedColor}
-              clearSelectedColor={clearSelectedColor}
+              
               selectedWeek={selectedWeek}
               setSelectedDay={setSelectedDay}
               setActiveView={setActiveView}
@@ -296,7 +303,7 @@ const CalendarSite = () => {
               editMode={editMode}
               selectedWeek={selectedWeek}
               selectedColor={selectedColor}
-              clearSelectedColor={clearSelectedColor}
+              
               selectedDay={selectedDay}
             />
           )}
