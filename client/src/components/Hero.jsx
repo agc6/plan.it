@@ -57,7 +57,7 @@ const Hero = () => {
               custom={3}
               className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
             >
-              <Link to="/get-started">
+              <Link to="/calendar">
           <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -67,6 +67,11 @@ const Hero = () => {
                 </motion.button>
               </Link>
 
+              <a 
+                href="https://www.youtube.com/watch?v=5wvedW2masE" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -77,6 +82,7 @@ const Hero = () => {
                   <path d="M8 5V19L19 12L8 5Z" fill="currentColor" />
                 </svg>
           </motion.button>
+              </a>
         </motion.div>          
         </motion.div>
       </div>
