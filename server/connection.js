@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const mongoURI = process.env.MONGO_URI || "mongodb+srv://planit:planitMongo@planit.fci45.mongodb.net/?retryWrites=true&w=majority&appName=planit";
+const mongoURI = process.env.MONGO_URI || "mongodb://localhost:5000/planit.fci45.mongodb.net";
 
 // Connect to MongoDB
 mongoose.connect(mongoURI)
